@@ -1,258 +1,116 @@
-use super::{spacer::LayoutDirection, *};
-use css_style::{
-    box_align::*, flexbox::*, prelude::*, Background, Border, Display, FlexDirection, Gap, Margin,
-    Padding,
-};
 use dioxus::prelude::*;
 
-// ======================== Row Component ========================
-
-/// Row properties.
-///
-/// Here you can find all properties that can be used with
-/// [Row](crate::row::Row) component.
 #[derive(Props, Clone, PartialEq)]
 pub struct Props {
-    pub body: Element,
+    pub children: Element,
 
-    /// Control the length of the Row
-    ///
-    /// The default is `Length::from(1.0)`
-    #[props(default = Some(Length::from(1.0)), strip_option, into)]
-    pub length: Option<Length>,
+    #[props(into)]
+    pub background: Option<String>,
 
-    /// Control the minimum length of the Row
-    ///
-    /// The default is `Length::MinContent`
-    #[props(default = Some(Length::MinContent), strip_option, into)]
-    pub min_length: Option<Length>,
+    #[props(into)]
+    pub width: Option<String>,
+    #[props(into)]
+    pub min_width: Option<String>,
+    #[props(into)]
+    pub max_width: Option<String>,
 
-    /// Control the maximum length of the Row
-    ///
-    /// The default is `None`
-    #[props(optional, into)]
-    pub max_length: Option<Length>,
+    #[props(into)]
+    pub height: Option<String>,
+    #[props(into)]
+    pub min_height: Option<String>,
+    #[props(into)]
+    pub max_height: Option<String>,
 
-    /// Control the width of the Row
-    ///
-    /// The default is `None`
-    #[props(optional, into)]
-    pub width: Option<Length>,
+    #[props(into)]
+    pub overflow: Option<String>,
+    pub reverse: Option<bool>,
+    pub wrap: Option<bool>,
 
-    /// Control the minimum width of the Row
-    ///
-    /// The default is `Length::MinContent`
-    #[props(default = Some(Length::MinContent), strip_option, into)]
-    pub min_width: Option<Length>,
+    #[props(into)]
+    pub align: Option<String>,
+    #[props(into)]
+    pub cross_align: Option<String>,
 
-    /// Control the maximum width of the Row
-    ///
-    /// The default is `None`
-    #[props(optional, into)]
-    pub max_width: Option<Length>,
+    #[props(into)]
+    pub gap: Option<String>,
+    #[props(into)]
+    pub padding: Option<String>,
+    #[props(into)]
+    pub margin: Option<String>,
 
-    /// Expand factor used to expand this row in direction relevant to it's
-    /// parent layout direction.
-    ///
-    /// When the parent is `Row` it will expand horizontally, when the parent is
-    /// `Column` it will expand vertically.
-    ///
-    /// Note: This only works when this `Row` inside another layout (e.g. Row/Column).
-    ///
-    /// The default is `None`
-    #[props(optional)]
-    pub expand_by: Option<f32>,
+    #[props(into)]
+    pub border: Option<String>,
+    #[props(into)]
+    pub border_top: Option<String>,
+    #[props(into)]
+    pub border_bottom: Option<String>,
+    #[props(into)]
+    pub border_left: Option<String>,
+    #[props(into)]
+    pub border_right: Option<String>,
 
-    /// Shrink factor used to shrink this row in direction relevant to it's
-    /// parent layout direction when needed.
-    ///
-    /// When the parent is `Row` it will shrink horizontally, when the parent is
-    /// `Column` it will shrink vertically.
-    ///
-    /// Note: This only works when this `Row` inside another layout (e.g. Row/Column).
-    ///
-    /// The default is `None`
-    #[props(optional)]
-    pub shrink_by: Option<f32>,
-
-    /// Make this layout inline
-    ///
-    /// The default is `false`
-    #[props(default = false)]
-    pub inline: bool,
-
-    /// Reverse the order of the children
-    ///
-    /// The default is `false`
-    #[props(default = false)]
-    pub reverse: bool,
-
-    /// Wrap into another row when there is no more horizontal space.
-    ///
-    /// The default is `false`
-    #[props(default = false)]
-    pub wrap: bool,
-
-    /// Align the children inside this row in main direction (vertically).
-    ///
-    /// The default is `None`
-    #[props(optional, into)]
-    pub align: Option<Align>,
-
-    /// Align the children inside this row in the cross direction
-    /// (horizontally).
-    ///
-    /// The default is `None`
-    #[props(optional, into)]
-    pub cross_align: Option<CrossAlign>,
-
-    /// Align this row when it's inside another layout, the alignment direction
-    /// is relevant to the parent layout direction
-    ///
-    /// When the parent is `Row` it will align horizontally, when the parent is
-    /// `Column` it will align vertically.
-    ///
-    /// Note: This only works when this `Row` inside another layout (e.g. Row/Column).
-    ///
-    /// The default is `None`
-    #[props(optional, into)]
-    pub align_self: Option<AlignSelf>,
-
-    /// Gap between children.
-    ///
-    /// This take `Gap` value, which can take either one value that defines the
-    /// gap for both the columns and rows (if there is any), or two values one
-    /// for rows and the other for columns.
-    ///
-    /// The default is `None`
-    #[props(optional, into)]
-    pub gap: Option<Gap>,
-
-    /// Reverse rows if there is more than one column within this `Column`.
-    ///
-    /// This only works when used with `wrap=true`.
-    ///
-    /// The default is `false`
-    #[props(default = false)]
-    pub reverse_rows: bool,
-
-    /// Align rows in the cross direction (vertically) if there is more than one
-    /// row within this `Row`.
-    ///
-    /// The default is `None`
-    #[props(optional, into)]
-    pub align_rows: Option<AlignRows>,
-
-    /// Overflow behavior for this Row
-    ///
-    /// By default any child that get oversized will be visible and may overlap
-    /// with other UI components. Change this property if you like to make the
-    /// content scrollable or make the oversized hidden/cliped.
-    ///
-    /// The default is `Overflow::visible()`
-    #[props(default = Overflow::visible(), into)]
-    pub overflow: Overflow,
-
-    /// Padding for the `Row`
-    ///
-    /// The default is `None`
-    #[props(optional, into)]
-    pub padding: Option<Padding>,
-
-    /// Margin for the `Row`
-    ///
-    /// The default is `None`
-    #[props(optional, into)]
-    pub margin: Option<Margin>,
-
-    /// Background for the `Row`
-    ///
-    /// The default is `None`
-    #[props(optional, into)]
-    pub background: Option<Background>,
-
-    /// Border for the `Row`
-    ///
-    /// The default is `None`
-    #[props(optional, into)]
-    pub border: Option<Border>,
-
-    /// Shadow for the `Row`
-    ///
-    /// The default is `None`
-    #[props(optional, into)]
-    pub shadow: Option<Shadow>,
+    #[props(into)]
+    pub shadow: Option<String>,
 }
 
 /// Row layout component.
 ///
-/// See [row properties docs](crate::row::Props) for more details on how to
-/// use them.
-///
 /// # Usage
 ///
 /// ```rust
-/// use dioxus_layout::{Row, Align};
+/// use ui::layout::{Row, Align};
 /// # use dioxus::prelude::*;
 ///
-/// # fn MyComponent(cx: Scope) -> Element {
-/// # cx.render(
+/// # fn MyComponent() -> Element {
 /// rsx! {
 ///     Row {
-///         align: Align::Center,
+///         align: "center",
 ///         wrap: true,
 ///         "Row children.."
 ///     }
 /// }
-/// # )
 /// # }
 /// ```
 #[allow(non_snake_case)]
+#[component]
 pub fn Row(props: Props) -> Element {
-    use_context_provider(|| LayoutDirection::Row);
-    let style = style()
-        .display(match props.inline {
-            true => Display::InlineFlex,
-            false => Display::Flex,
-        })
-        .and_size(|s| {
-            s.try_width(props.length.clone())
-                .try_min_width(props.min_length.clone())
-                .try_max_width(props.max_length.clone())
-                .try_height(props.width.clone())
-                .try_min_height(props.min_width.clone())
-                .try_max_height(props.max_width.clone())
-        })
-        .flex_direction(match props.reverse {
-            true => FlexDirection::RowReverse,
-            false => FlexDirection::Row,
-        })
-        .try_flex_wrap(match (props.wrap, props.reverse_rows) {
-            (true, true) => Some(Wrap::WrapReverse),
-            (true, false) => Some(Wrap::Wrap),
-            _ => None,
-        })
-        .try_justify_content(props.align)
-        .try_align_items(props.cross_align)
-        .try_align_content(props.align_rows)
-        .try_align_self(props.align_self)
-        .try_flex_grow(props.expand_by)
-        .try_flex_shrink(props.shrink_by)
-        .try_gap(props.gap.clone())
-        .try_padding(props.padding.clone())
-        .try_margin(props.margin.clone())
-        .try_background(props.background.clone())
-        .try_border(props.border.clone())
-        .try_box_shadow(props.shadow.clone())
-        .insert("box-sizing", "border-box")
-        .merge(props.overflow)
-        .to_string();
-
     rsx! {
         div {
             class: "dioxus-layout-row",
-            style: "{style}",
-            {props.body}
+            display: "flex",
+            flex_direction: match props.reverse {
+                Some(true) => "row-reverse",
+                _ => "row",
+            },
+
+            background: props.background,
+
+            width: props.width,
+            min_width: props.min_width,
+            max_width: props.max_width,
+
+            height: props.height,
+            min_height: props.min_height,
+            max_height: props.max_height,
+
+            overflow: props.overflow,
+
+            justify_content: props.align,
+            align_items: props.cross_align,
+
+            gap: props.gap,
+            padding: props.padding,
+            margin: props.margin,
+
+            border: props.border,
+            border_top: props.border_top,
+            border_bottom: props.border_bottom,
+            border_left: props.border_left,
+            border_right: props.border_right,
+
+            box_shadow: props.shadow,
+
+            {props.children}
         }
     }
 }

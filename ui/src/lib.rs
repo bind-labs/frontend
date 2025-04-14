@@ -1,7 +1,7 @@
 //! This crate contains all shared UI for the workspace.
 
-mod layout;
-pub use layout::*;
+pub mod icons;
+pub mod layout;
 
 mod hero;
 pub use hero::Hero;
