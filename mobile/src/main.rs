@@ -16,6 +16,8 @@ enum Route {
 }
 
 const MAIN_CSS: Asset = asset!("/assets/main.css");
+const SOURCE_SERIF_4_ITALIC: Asset = asset!("/assets/fonts/SourceSerif4Variable-Italic.otf.woff2");
+const SOURCE_SERIF_4_ROMAN: Asset = asset!("/assets/fonts/SourceSerif4Variable-Roman.otf.woff2");
 
 fn main() {
     dioxus::launch(App);
@@ -23,11 +25,11 @@ fn main() {
 
 #[component]
 fn App() -> Element {
-    // Build cool things ✌️
-
     rsx! {
         // Global app resources
         document::Link { rel: "stylesheet", href: MAIN_CSS }
+        style { "@font-face {{ font-family: 'Source Serif 4'; src: url({SOURCE_SERIF_4_ROMAN}); }}" }
+        style { "@font-face {{ font-family: 'Source Serif 4'; font-style: italic; src: url({SOURCE_SERIF_4_ITALIC}); }}" }
 
         Router::<Route> {}
     }
