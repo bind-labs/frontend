@@ -1,8 +1,10 @@
+use components::header::Header;
 use dioxus::prelude::*;
 
 use ui::Navbar;
-use views::{Blog, Home};
+use views::Home;
 
+mod components;
 mod views;
 
 #[derive(Debug, Clone, Routable, PartialEq)]
@@ -11,8 +13,6 @@ enum Route {
     #[layout(MobileNavbar)]
     #[route("/")]
     Home {},
-    #[route("/blog/:id")]
-    Blog { id: i32 },
 }
 
 const MAIN_CSS: Asset = asset!("/assets/main.css");
@@ -29,7 +29,9 @@ fn App() -> Element {
         // Global app resources
         document::Link { rel: "stylesheet", href: MAIN_CSS }
         style { "@font-face {{ font-family: 'Source Serif 4'; src: url({SOURCE_SERIF_4_ROMAN}); }}" }
-        style { "@font-face {{ font-family: 'Source Serif 4'; font-style: italic; src: url({SOURCE_SERIF_4_ITALIC}); }}" }
+        style {
+            "@font-face {{ font-family: 'Source Serif 4'; font-style: italic; src: url({SOURCE_SERIF_4_ITALIC}); }}"
+        }
 
         Router::<Route> {}
     }
@@ -40,16 +42,7 @@ fn App() -> Element {
 #[component]
 fn MobileNavbar() -> Element {
     rsx! {
-        Navbar {
-            Link {
-                to: Route::Home {},
-                "Home"
-            }
-            Link {
-                to: Route::Blog { id: 1 },
-                "Blog"
-            }
-        }
+        Header { title: "Read Later", additional: Some("(16 items)".to_string()), onsettings: move || log::info!("Settings clicked") }
 
         Outlet::<Route> {}
     }

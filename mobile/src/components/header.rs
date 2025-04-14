@@ -1,0 +1,34 @@
+use dioxus::prelude::*;
+use ui::icons::Cog6Tooth;
+use ui::layout::*;
+
+#[derive(Props, Clone, PartialEq)]
+pub struct HeaderProps {
+    pub title: String,
+    pub additional: Option<String>,
+    pub onsettings: EventHandler<()>,
+}
+
+#[allow(non_snake_case)]
+#[component]
+pub fn Header(props: HeaderProps) -> Element {
+    let HeaderProps {
+        title,
+        additional,
+        onsettings,
+    } = props;
+
+    rsx! {
+        Row { padding: "14px 16px", align: "space-between", cross_align: "center", border_bottom: "1px solid black",
+
+            Row { gap: "8px", cross_align: "baseline",
+                span { font_size: "18px", font_weight: 600, "{title}" }
+                {additional.map(|additional| rsx! {
+                    span { font_size: "14px", color: "#666666", "{additional}" }
+                })}
+            }
+
+            Cog6Tooth {}
+        }
+    }
+}

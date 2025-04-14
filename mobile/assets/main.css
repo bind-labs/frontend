@@ -1,7 +1,7 @@
 body {
-  background-color: #0f1116;
-  color: #ffffff;
+  background-color: hsla(40, 37%, 92%, 1);
+  color: black;
   font-family: "Source Serif 4", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  margin: 20px;
+  margin: 0;
 }
 
