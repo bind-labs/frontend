@@ -20,9 +20,9 @@
         # Create a custom Android SDK with specific components
         customAndroidSdk = pkgs.androidenv.composeAndroidPackages {
           toolsVersion = null;
-          platformToolsVersion = "34.0.4";
+          platformToolsVersion = "34.0.5";
+          buildToolsVersions = [ "34.0.0" ];
           # TODO: do we need both 33 and 34?
-          buildToolsVersions = [ "33.0.0" "34.0.0" ];
           platformVersions = [ "33" "34" ];
 
           includeNDK = true;
@@ -33,7 +33,7 @@
 
         # Create emulator using emulateApp function
         emulator = pkgs.androidenv.emulateApp {
-          name = "react-native-emulator";
+          name = "emulator";
           platformVersion = "34";
           abiVersion = "x86_64";
           systemImageType = "google_apis";
@@ -72,9 +72,6 @@
 
             # For Java
             export JAVA_HOME="${pkgs.jdk21}"
-
-            # Configure Gradle to use the right aapt2
-            export GRADLE_OPTS="-Dorg.gradle.project.android.aapt2FromMavenOverride=$ANDROID_HOME/build-tools/34.0.0/aapt2"
           '';
         };
       });
