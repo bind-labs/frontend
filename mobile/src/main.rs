@@ -1,4 +1,6 @@
 use components::header::Header;
+use dioxus::dioxus_core::LaunchConfig;
+use dioxus::mobile::wry::WebView;
 use dioxus::prelude::*;
 
 use ui::Navbar;
@@ -10,7 +12,6 @@ mod views;
 #[derive(Debug, Clone, Routable, PartialEq)]
 #[rustfmt::skip]
 enum Route {
-    #[layout(MobileNavbar)]
     #[route("/")]
     Home {},
 }
@@ -29,21 +30,9 @@ fn App() -> Element {
         // Global app resources
         document::Link { rel: "stylesheet", href: MAIN_CSS }
         style { "@font-face {{ font-family: 'Source Serif 4'; src: url({SOURCE_SERIF_4_ROMAN}); }}" }
-        style {
-            "@font-face {{ font-family: 'Source Serif 4'; font-style: italic; src: url({SOURCE_SERIF_4_ITALIC}); }}"
-        }
+        style { "@font-face {{ font-family: 'Source Serif 4'; font-style: italic; src: url({SOURCE_SERIF_4_ITALIC}); }}" }
 
+        Header { title: "Read Later", additional: Some("(16 items)".to_string()), onsettings: move || tracing::info!("Settings clicked") }
         Router::<Route> {}
-    }
-}
-
-/// A mobile-specific Router around the shared `Navbar` component
-/// which allows us to use the mobile-specific `Route` enum.
-#[component]
-fn MobileNavbar() -> Element {
-    rsx! {
-        Header { title: "Read Later", additional: Some("(16 items)".to_string()), onsettings: move || log::info!("Settings clicked") }
-
-        Outlet::<Route> {}
     }
 }

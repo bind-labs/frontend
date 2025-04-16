@@ -1,7 +1,11 @@
 use dioxus::prelude::*;
-use ui::Hero;
+use ui::{layout::Row, Hero};
+
+use crate::components::feed_list::FeedList;
 
 #[component]
 pub fn Home() -> Element {
-    rsx! {}
+    rsx! {
+        FeedList { }
+    }
 }

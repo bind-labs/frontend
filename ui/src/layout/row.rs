@@ -5,6 +5,17 @@ pub struct Props {
     pub children: Element,
 
     #[props(into)]
+    pub position: Option<String>,
+    #[props(into)]
+    pub top: Option<String>,
+    #[props(into)]
+    pub right: Option<String>,
+    #[props(into)]
+    pub bottom: Option<String>,
+    #[props(into)]
+    pub left: Option<String>,
+
+    #[props(into)]
     pub background: Option<String>,
 
     #[props(into)]
@@ -82,6 +93,12 @@ pub fn Row(props: Props) -> Element {
                 Some(true) => "row-reverse",
                 _ => "row",
             },
+
+            position: props.position,
+            top: props.top,
+            right: props.right,
+            bottom: props.bottom,
+            left: props.left,
 
             background: props.background,
 

@@ -8,7 +8,7 @@ use dioxus::prelude::*;
 /// [Column](crate::column::Column) component.
 #[derive(Props, Clone, PartialEq)]
 pub struct Props {
-    pub body: Element,
+    pub children: Element,
 
     #[props(into)]
     pub background: Option<String>,
@@ -116,7 +116,8 @@ pub fn Column(props: Props) -> Element {
             border_right: props.border_right,
 
             box_shadow: props.shadow,
-            {props.body}
+
+            {props.children}
         }
     }
 }

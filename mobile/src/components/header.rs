@@ -19,7 +19,7 @@ pub fn Header(props: HeaderProps) -> Element {
     } = props;
 
     rsx! {
-        Row { padding: "14px 16px", align: "space-between", cross_align: "center", border_bottom: "1px solid black",
+        header { display: "flex", padding: "14px 16px", justify_content: "space-between", align_items: "center", border_bottom: "1px solid black",
 
             Row { gap: "8px", cross_align: "baseline",
                 span { font_size: "18px", font_weight: 600, "{title}" }
