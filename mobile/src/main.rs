@@ -31,9 +31,7 @@ const SOURCE_SERIF_4_ITALIC: Asset = asset!("/assets/fonts/SourceSerif4Variable-
 const SOURCE_SERIF_4_ROMAN: Asset = asset!("/assets/fonts/SourceSerif4Variable-Roman.otf.woff2");
 
 fn main() {
-    dioxus::LaunchBuilder::mobile()
-        .with_cfg(Config::new().with_window(WindowBuilder::new().with_title("Bind")))
-        .launch(App);
+    dioxus::launch(App);
 }
 
 fn set_android_flags() {

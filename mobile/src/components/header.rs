@@ -2,22 +2,9 @@ use dioxus::prelude::*;
 use ui::icons::Cog6Tooth;
 use ui::layout::*;
 
-#[derive(Props, Clone, PartialEq)]
-pub struct HeaderProps {
-    pub title: String,
-    pub additional: Option<String>,
-    pub onsettings: EventHandler<()>,
-}
-
 #[allow(non_snake_case)]
 #[component]
-pub fn Header(props: HeaderProps) -> Element {
-    let HeaderProps {
-        title,
-        additional,
-        onsettings,
-    } = props;
-
+pub fn Header(title: String, additional: Option<String>, onsettings: EventHandler<()>) -> Element {
     rsx! {
         header { display: "flex", padding: "14px 16px", justify_content: "space-between", align_items: "center", border_bottom: "1px solid black",
 
