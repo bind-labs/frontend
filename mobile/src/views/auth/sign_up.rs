@@ -13,8 +13,9 @@ use ui::{
 };
 
 #[component]
-pub fn Login() -> Element {
-    let mut email_or_username = use_signal(String::new);
+pub fn SignUp() -> Element {
+    let mut email = use_signal(String::new);
+    let mut username = use_signal(String::new);
     let mut password = use_signal(String::new);
 
     rsx! {
@@ -29,7 +30,7 @@ pub fn Login() -> Element {
             padding: "36px 16px",
 
             Header {
-                subtitle: "Welcome back to",
+                subtitle: "Welcome to",
                 title: "Bind",
             }
 
@@ -43,7 +44,7 @@ pub fn Login() -> Element {
                         // login
                     },
                     GoogleIcon {},
-                    "Login with Google",
+                    "Sign up with Google",
                 },
                 button {
                     class: "solid",
@@ -51,7 +52,7 @@ pub fn Login() -> Element {
                         // redirect to apple oauth
                     },
                     AppleIcon {},
-                    "Login with Apple",
+                    "Sign up with Apple",
                 }
             }
 
@@ -62,13 +63,23 @@ pub fn Login() -> Element {
                 gap: "24px",
 
                 Input {
-                    title: "Email or Username",
-                    placeholder: "Email or Username",
+                    title: "Email",
+                    placeholder: "Email",
+                    icon: rsx! {
+                        EnvelopeIcon {}
+                    },
+                    onchange: move |value| {
+                        email.set(value);
+                    }
+                },
+                Input {
+                    title: "Username",
+                    placeholder: "Username",
                     icon: rsx! {
                         UserIcon {}
                     },
                     onchange: move |value| {
-                        email_or_username.set(value);
+                        username.set(value);
                     }
                 },
                 Input {
@@ -92,19 +103,13 @@ pub fn Login() -> Element {
                         onclick: move |_| {
                             // login
                         },
-                        "Login",
-                    },
-                    TransparentButton {
-                        onclick: move |_| {
-                            // reset password
-                        },
-                        "Reset Password",
-                    },
-                    TransparentButton {
-                        onclick: move |_| {
-                            navigator().push(Route::SignUp {});
-                        },
                         "Sign up",
+                    },
+                    TransparentButton {
+                        onclick: move |_| {
+                            navigator().push(Route::Login {});
+                        },
+                        "Login",
                     }
                 }
             }

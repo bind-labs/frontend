@@ -1120,6 +1120,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "dioxus-motion"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "05b22f47699c0f8cdba183906f4ff9dd633d0bc36ddd57db370000e79d123917"
+dependencies = [
+ "dioxus",
+ "dioxus-motion-transitions-macro",
+ "easer",
+ "futures-channel",
+ "futures-util",
+ "instant",
+ "tokio",
+]
+
+[[package]]
+name = "dioxus-motion-transitions-macro"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5db137c096960ce1d6465f2ee88bc4eb953f79b16e76d426751cc22025e1a215"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.100",
+]
+
+[[package]]
 name = "dioxus-router"
 version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1307,6 +1333,15 @@ name = "dunce"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "92773504d58c093f6de2459af4af33faa518c13451eb8f2b5698ed3d36e7c813"
+
+[[package]]
+name = "easer"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fba524f8b83c9c5bde02c2bb1627de9d1f81980489a6d54168cdfd08c258f917"
+dependencies = [
+ "num-traits",
+]
 
 [[package]]
 name = "endi"
@@ -2636,6 +2671,7 @@ name = "mobile"
 version = "0.1.0"
 dependencies = [
  "dioxus",
+ "dioxus-motion",
  "serde",
  "serde_json",
  "tracing",

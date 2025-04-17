@@ -7,7 +7,8 @@ mod components;
 mod storage;
 mod views;
 
-use views::dashboard::Route;
+use views::auth::Route as AuthRoute;
+use views::dashboard::Route as DashboardRoute;
 
 const MAIN_CSS: Asset = asset!("/assets/main.css");
 const SOURCE_SERIF_4_ITALIC: Asset = asset!("/assets/fonts/SourceSerif4Variable-Italic.otf.woff2");
@@ -20,6 +21,7 @@ fn main() {
 fn set_android_flags() {
     if cfg!(target_os = "android") {
         use dioxus::mobile::wry::prelude::dispatch;
+        // TODO: remove unwraps
         dispatch(|env, activity, _webview| {
             // Get the window
             let window = env
@@ -80,6 +82,6 @@ fn App() -> Element {
         style { "@font-face {{ font-family: 'Source Serif 4'; src: url({SOURCE_SERIF_4_ROMAN}); }}" }
         style { "@font-face {{ font-family: 'Source Serif 4'; font-style: italic; src: url({SOURCE_SERIF_4_ITALIC}); }}" }
 
-        Router::<Route> {}
+        Router::<AuthRoute> {}
     }
 }

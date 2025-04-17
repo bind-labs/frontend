@@ -1,16 +1,18 @@
 use dioxus::prelude::*;
 
+mod components;
 mod login;
-mod register;
+mod sign_up;
 
 use login::Login;
-use register::Register;
+use sign_up::SignUp;
 
 #[derive(Debug, Clone, Routable, PartialEq)]
-#[layout(AuthLayout)]
-enum Route {
-    #[route("/")]
+pub enum Route {
+    // default to /sign-up
+    #[redirect("/:..segments", |segments: Vec<String>| Route::SignUp {})]
+    #[route("/sign-up")]
+    SignUp {},
+    #[route("/login")]
     Login {},
-    #[route("/register")]
-    Register {},
 }

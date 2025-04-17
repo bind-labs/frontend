@@ -17,7 +17,7 @@ use search::Search;
 #[rustfmt::skip]
 pub enum Route {
     #[layout(DashboardLayout)]
-        //  if the current location doesn't match any of the other routes, redirect to "/feed"
+        // default to /feed
         #[redirect("/:..segments", |segments: Vec<String>| Route::Feed {})]
         #[route("/feed")]
         Feed {},
