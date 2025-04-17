@@ -45,6 +45,7 @@ pub fn FeedList() -> Element {
         Column {
             for i in 0..12 {
                 FeedListItem {
+                    key: i,
                     image_url: "https://upload.wikimedia.org/wikipedia/en/d/d1/Plasticbeach452.jpg",
                     title: "On Melancholy Hill",
                     description: "On Melancholy Hill is the third single from British virtual band Gorillaz's third studio album, Plastic Beach.",

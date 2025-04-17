@@ -1,3 +1,1 @@
-pub mod feed_list;
-pub mod header;
-
+pub mod navbar;

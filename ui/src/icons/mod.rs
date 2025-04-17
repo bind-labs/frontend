@@ -10,6 +10,24 @@ pub struct IconProps {
     pub solid: bool,
 }
 
+impl IconProps {
+    pub fn fill(&self) -> String {
+        if self.solid {
+            self.color.clone()
+        } else {
+            "none".to_string()
+        }
+    }
+
+    pub fn stroke(&self) -> String {
+        if self.solid {
+            "none".to_string()
+        } else {
+            self.color.clone()
+        }
+    }
+}
+
 mod apple;
 mod archive_box;
 mod arrow_top_right_on_square;

@@ -1,32 +1,13 @@
-use components::header::Header;
 use dioxus::dioxus_core::LaunchConfig;
 use dioxus::mobile::wry::WebView;
 use dioxus::mobile::{use_window, Config, WindowBuilder};
 use dioxus::prelude::*;
 
-use storage::use_persistent;
-use ui::Navbar;
-use views::*;
-
 mod components;
 mod storage;
 mod views;
 
-#[derive(Debug, Clone, Routable, PartialEq)]
-#[rustfmt::skip]
-enum Route {
-    #[route("/")]
-    Home {},
-}
-
-#[derive(Debug, Clone, Routable, PartialEq)]
-#[rustfmt::skip]
-enum AuthRoute {
-    #[route("/")]
-    Register {},
-    #[route("/login")]
-    Login {},
-}
+use views::dashboard::Route;
 
 const MAIN_CSS: Asset = asset!("/assets/main.css");
 const SOURCE_SERIF_4_ITALIC: Asset = asset!("/assets/fonts/SourceSerif4Variable-Italic.otf.woff2");
@@ -89,8 +70,6 @@ fn set_android_flags() {
 
 #[component]
 fn App() -> Element {
-    let mut is_logged_in = use_signal(|| false);
-
     use_effect(|| {
         set_android_flags();
     });
@@ -101,12 +80,6 @@ fn App() -> Element {
         style { "@font-face {{ font-family: 'Source Serif 4'; src: url({SOURCE_SERIF_4_ROMAN}); }}" }
         style { "@font-face {{ font-family: 'Source Serif 4'; font-style: italic; src: url({SOURCE_SERIF_4_ITALIC}); }}" }
 
-        Header { title: "Read Later", additional: Some("(16 items)".to_string()), onsettings: move || tracing::info!("Settings clicked") }
-        button { onclick: move |_| is_logged_in.set(!is_logged_in()), "Login" }
-        if is_logged_in() {
-            Router::<Route> {}
-        } else {
-            Router::<AuthRoute> {}
-        }
+        Router::<Route> {}
     }
 }

@@ -47,13 +47,22 @@ pub fn Login() -> Element {
         }
         div {
             SolidButton {
-                "Login"
+                onclick: move |_| {
+                    // login
+                },
+                "Login",
             },
             UnstyledButton {
-                "Reset Password"
+                onclick: move |_| {
+                    // reset password
+                },
+                "Reset Password",
             },
             UnstyledButton {
-                "Sign up"
+                onclick: move |_| {
+                    // sign up
+                },
+                "Sign up",
             }
         }
     }
