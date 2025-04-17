@@ -4,10 +4,12 @@ use dioxus::mobile::wry::WebView;
 use dioxus::mobile::{use_window, Config, WindowBuilder};
 use dioxus::prelude::*;
 
+use storage::use_persistent;
 use ui::Navbar;
 use views::*;
 
 mod components;
+mod storage;
 mod views;
 
 #[derive(Debug, Clone, Routable, PartialEq)]
