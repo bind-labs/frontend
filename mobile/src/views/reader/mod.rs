@@ -1,10 +1,13 @@
-use dioxus::prelude::*;
-
+use dioxus::{mobile::window, prelude::*};
+mod components;
 mod feed_reader;
 mod parsed_reader;
 
-use crate::components::navbar::{Navbar, NavbarButton};
-use ui::icons::{Bars3Icon, BookmarkIcon, PlusIcon, QueueIcon, SearchIcon};
+use crate::components::navbar::{Navbar, NavbarButton, NavbarButtonWithoutRoute};
+use ui::icons::{
+    ArrowTopRightOnSquareIcon, Bars3Icon, BookmarkIcon, NewspaperIcon, PlusIcon, QueueIcon,
+    SearchIcon, ShareIcon, TextSettingsIcon,
+};
 
 use feed_reader::FeedReader;
 use parsed_reader::ParsedReader;
@@ -23,7 +26,7 @@ pub enum Route {
 }
 
 #[allow(non_snake_case)]
-fn ReaderLayout() -> Element {
+pub fn ReaderLayout() -> Element {
     let nav = use_navigator();
 
     rsx! {
@@ -33,10 +36,55 @@ fn ReaderLayout() -> Element {
             height: "100vh",
             width: "100vw",
 
-            main { overflow: "auto", Outlet::<Route> {} }
+            main { overflow: "auto",
+
+            padding: "16px",
+             Outlet::<Route> {} }
 
             Navbar {
+                NavbarButtonWithoutRoute {
+                    onclick: move |_| {},
+                    span {
+                        font_family: "IBM Plex Mono",
+                        font_size: "24px",
+                        line_height: "20px",
+                        "Aa"
+                    }
 
+                }
+                NavbarButton {
+                    to: Route::FeedReader {},
+                    icon: |solid| rsx! {
+                        NewspaperIcon { solid }
+                    },
+                }
+                NavbarButton {
+                    to: Route::ParsedReader {},
+                    icon: |solid| rsx! {
+                        ArrowTopRightOnSquareIcon { solid }
+                    },
+                }
+                NavbarButton {
+                    to: Route::ParsedReader {},
+                    icon: |solid| rsx! {
+                        BookmarkIcon { solid }
+                    },
+                }
+                NavbarButtonWithoutRoute {
+                    onclick: move |_| {
+                        document::eval(&format!(
+                            r#"navigator.share({{
+                                title: "My Title",
+                                text: "My Text",
+                                url: "https://example.com"
+                            }});
+                        "#));
+                    },
+                    ShareIcon {
+
+                    }
+
+                }
             }
         }
     }

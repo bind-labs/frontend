@@ -32,16 +32,23 @@
         };
 
         # Create emulator using emulateApp function
-        emulator = pkgs.androidenv.emulateApp {
-          name = "emulator";
-          platformVersion = "34";
-          abiVersion = "x86_64";
-          systemImageType = "google_apis";
-        };
+        # emulator = pkgs.androidenv.emulateApp {
+        #   name = "emulator";
+        #   platformVersion = "34";
+        #   abiVersion = "x86_64";
+        #   systemImageType = "google_apis";
+        #   androidAvdFlags = "-d 42";
+        #   deviceName = "bingo";
+        # };
 
-        # Helper script to start emulator with additional options
-        startEmulatorScript = pkgs.writeScriptBin "start-emulator"
-          "${emulator}/bin/run-test-emulator";
+        # # Helper script to start emulator with additional options
+        # startEmulatorScript = pkgs.writeScriptBin "start-emulator"
+        #   "${emulator}/bin/run-test-emulator";
+        #
+        startEmulatorScript = pkgs.writeShellScriptBin "start-emulator" ''
+            avdmanager create avd --force --name "bingo" --package "system-images;android-34;google_apis;x86_64" --device 42
+            emulator -avd bingo -no-boot-anim -port 5554 -gpu swiftshader_indirect
+        '';
       in {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
@@ -67,8 +74,8 @@
 
             # Android emulator flags
             # Not working on Nvidia 570 drivers
-            # export NIX_ANDROID_EMULATOR_FLAGS="-gpu host -no-snapshot-save"
-            export NIX_ANDROID_EMULATOR_FLAGS="-netdelay none -netspeed full"
+            # export NIX_ANDROID_EMULATOR_FLAGS="-no-snapshot-save -gpu swiftshader_indirect"
+            export NIX_ANDROID_EMULATOR_FLAGS="-netdelay none -netspeed full -gpu swiftshader_indirect"
 
             # For Java
             export JAVA_HOME="${pkgs.jdk21}"

@@ -73,9 +73,7 @@ pub fn Login() -> Element {
                 // Actions
                 Column { gap: "12px", align: "stretch",
 
-                    SolidButton { onclick: move |_| {
-
-                    }, "Login" }
+                    SolidButton { onclick: move |_| {}, "Login" }
                     TransparentButton { onclick: move |_| {}, "Reset Password" }
                     TransparentButton {
                         onclick: move |_| {
