@@ -4,6 +4,7 @@ use dioxus::mobile::{use_window, Config, WindowBuilder};
 use dioxus::prelude::*;
 
 mod components;
+mod share;
 mod storage;
 mod views;
 

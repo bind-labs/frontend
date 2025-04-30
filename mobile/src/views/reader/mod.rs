@@ -3,7 +3,10 @@ mod components;
 mod feed_reader;
 mod parsed_reader;
 
-use crate::components::navbar::{Navbar, NavbarButton, NavbarButtonWithoutRoute};
+use crate::{
+    components::navbar::{Navbar, NavbarButton, NavbarButtonWithoutRoute},
+    share::share_feed_item,
+};
 use ui::icons::{
     ArrowTopRightOnSquareIcon, Bars3Icon, BookmarkIcon, NewspaperIcon, PlusIcon, QueueIcon,
     SearchIcon, ShareIcon, TextSettingsIcon,
@@ -72,13 +75,7 @@ pub fn ReaderLayout() -> Element {
                 }
                 NavbarButtonWithoutRoute {
                     onclick: move |_| {
-                        document::eval(&format!(
-                            r#"navigator.share({{
-                                title: "My Title",
-                                text: "My Text",
-                                url: "https://example.com"
-                            }});
-                        "#));
+                         share_feed_item("https://example.com".to_string(), "testing".to_string());
                     },
                     ShareIcon {
 
