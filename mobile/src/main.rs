@@ -18,7 +18,9 @@ const SOURCE_SERIF_4_ROMAN: Asset = asset!("/assets/fonts/SourceSerif4Variable-R
 const IBM_PLEX_MONO: Asset = asset!("/assets/fonts/ibm-plex-mono-latin-400-normal.woff2");
 
 fn main() {
-    dioxus::launch(App);
+    dioxus::LaunchBuilder::mobile()
+        .with_cfg(Config::new().with_background_color((0xF2, 0xED, 0xE3, 0xFF)))
+        .launch(App);
 }
 
 #[cfg(target_os = "android")]

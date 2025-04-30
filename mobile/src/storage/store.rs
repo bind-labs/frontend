@@ -37,7 +37,7 @@ impl SecureStore {
         }
 
         // If not in cache, fetch from secure storage
-        let result = secure_retrieve(key);
+        let result = secure_retrieve(key).unwrap_or(None);
 
         // Update cache if value exists
         if let Some(ref value) = result {
@@ -70,6 +70,6 @@ impl SecureStore {
         }
 
         // Check secure storage
-        secure_retrieve(key).is_some()
+        secure_retrieve(key).map(|v| v.is_some()).unwrap_or(false)
     }
 }

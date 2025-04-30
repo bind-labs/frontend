@@ -1,233 +1,332 @@
-use dioxus::mobile::wry::prelude::dispatch;
+//! Android Secure Storage Implementation using EncryptedSharedPreferences.
+//!
+//! **Important:** Ensure you have added the necessary dependency to your Android
+//! project's `app/build.gradle` file:
+//!
+//! dependencies {
+//!     implementation("androidx.security:security-crypto:1.1.0-alpha06") // Or the latest stable version
+//! }
+
+use dioxus::mobile::wry::prelude::{dispatch, find_class};
+use jni::objects::{JObject, JString, JValue};
+use jni::JNIEnv;
 use std::sync::mpsc;
 
-// Function to securely store a key-value pair
-pub fn secure_store(key: &str, value: &str) -> () {
+#[derive(Debug)]
+pub enum SecureStorageError {
+    Jni(jni::errors::Error),
+    RecvError(mpsc::RecvError),
+}
+
+impl From<jni::errors::Error> for SecureStorageError {
+    fn from(err: jni::errors::Error) -> Self {
+        SecureStorageError::Jni(err)
+    }
+}
+
+impl From<mpsc::RecvError> for SecureStorageError {
+    fn from(err: mpsc::RecvError) -> Self {
+        SecureStorageError::RecvError(err)
+    }
+}
+
+type Result<T> = std::result::Result<T, SecureStorageError>;
+
+/// Securely stores a key-value pair using Android EncryptedSharedPreferences.
+pub fn secure_store(key: &str, value: &str) -> Result<()> {
     let key_str = key.to_string();
     let value_str = value.to_string();
 
-    let (tx, rx) = mpsc::channel();
+    let (tx, rx) = mpsc::channel::<Result<()>>();
 
-    dispatch(move |env, activity, _webview| {
-        let result = (|| {
-            // Get the context
-            let context = activity.clone();
+    dispatch(move |env: &mut JNIEnv, activity: &JObject, _webview| {
+        let result = (|| -> Result<()> {
+            // Find Classes
+            let master_key_class = find_class(
+                env,
+                activity,
+                "androidx/security/crypto/MasterKey$Builder".to_string(),
+            )?;
+            let key_scheme_enum = find_class(
+                env,
+                activity,
+                "androidx/security/crypto/MasterKey$KeyScheme".to_string(),
+            )?;
+            let encrypted_prefs_class = find_class(
+                env,
+                activity,
+                "androidx/security/crypto/EncryptedSharedPreferences".to_string(),
+            )?;
+            let pref_key_scheme_enum = find_class(
+                env,
+                activity,
+                "androidx/security/crypto/EncryptedSharedPreferences$PrefKeyEncryptionScheme"
+                    .to_string(),
+            )?;
+            let pref_value_scheme_enum = find_class(
+                env,
+                activity,
+                "androidx/security/crypto/EncryptedSharedPreferences$PrefValueEncryptionScheme"
+                    .to_string(),
+            )?;
 
-            // Get the security library classes
-            let master_key_class = env
-                .find_class("androidx/security/crypto/MasterKey$Builder")
-                .unwrap();
-            let encrypted_prefs_class = env
-                .find_class("androidx/security/crypto/EncryptedSharedPreferences")
-                .unwrap();
+            // Create Master Key Builder
+            let master_key_builder = env.new_object(
+                &master_key_class,
+                "(Landroid/content/Context;)V",
+                &[JValue::Object(activity)],
+            )?;
 
-            // Create master key
-            let master_key_builder = env
-                .new_object(
-                    &master_key_class,
-                    "(Landroid/content/Context;)V",
-                    &[context.into()],
-                )
-                .unwrap();
+            // Get MasterKey.KeyScheme.AES256_GCM enum value
+            let key_scheme_aes256_gcm = env
+                .get_static_field(
+                    key_scheme_enum,
+                    "AES256_GCM",
+                    "Landroidx/security/crypto/MasterKey$KeyScheme;",
+                )?
+                .l()?;
 
-            // Set key parameters
-            env.call_method(
+            // Set key scheme
+            let master_key_builder = env.call_method( // Re-assign builder
                 &master_key_builder,
                 "setKeyScheme",
-                "(I)Landroidx/security/crypto/MasterKey$Builder;",
-                &[3i32.into()], // MasterKey.KeyScheme.AES256_GCM
-            )
-            .unwrap();
+                "(Landroidx/security/crypto/MasterKey$KeyScheme;)Landroidx/security/crypto/MasterKey$Builder;",
+                &[JValue::Object(&key_scheme_aes256_gcm)],
+            )?.l()?;
 
+            // Build the MasterKey
             let master_key = env
                 .call_method(
                     &master_key_builder,
                     "build",
                     "()Landroidx/security/crypto/MasterKey;",
                     &[],
-                )
-                .unwrap()
-                .l()
-                .unwrap();
+                )?
+                .l()?;
 
-            // Get file name for preferences
-            let pref_file = env.new_string("secure_prefs").unwrap();
+            // Get EncryptedSharedPreferences Settings
+            let pref_file_name = env.new_string("secure_prefs")?;
 
-            // Get encryption schemes
-            let aes256_scheme = env
+            // Get PrefKeyEncryptionScheme.AES256_SIV enum value
+            let pref_key_scheme_aes256_siv = env
                 .get_static_field(
-                    "androidx/security/crypto/EncryptedSharedPreferences$PrefKeyEncryptionScheme",
+                    pref_key_scheme_enum,
                     "AES256_SIV",
                     "Landroidx/security/crypto/EncryptedSharedPreferences$PrefKeyEncryptionScheme;",
-                )
-                .unwrap()
-                .l()
-                .unwrap();
+                )?
+                .l()?;
 
-            let aes256_value_scheme = env.get_static_field(
-                  "androidx/security/crypto/EncryptedSharedPreferences$PrefValueEncryptionScheme",
-                  "AES256_GCM",
-                  "Landroidx/security/crypto/EncryptedSharedPreferences$PrefValueEncryptionScheme;"
-              ).unwrap().l().unwrap();
+            // Get PrefValueEncryptionScheme.AES256_GCM enum value
+            let pref_value_scheme_aes256_gcm = env.get_static_field(
+                pref_value_scheme_enum,
+                "AES256_GCM",
+                "Landroidx/security/crypto/EncryptedSharedPreferences$PrefValueEncryptionScheme;",
+            )?.l()?;
 
-            // Create encrypted preferences
+            // Create EncryptedSharedPreferences
             let encrypted_prefs = env.call_static_method(
-                  &encrypted_prefs_class,
-                  "create",
-                  "(Landroid/content/Context;Ljava/lang/String;Landroidx/security/crypto/MasterKey;Landroidx/security/crypto/EncryptedSharedPreferences$PrefKeyEncryptionScheme;Landroidx/security/crypto
-  /EncryptedSharedPreferences$PrefValueEncryptionScheme;)Landroid/content/SharedPreferences;",
-                  &[
-                      context.into(),
-                      (&pref_file).into(),
-                      (&master_key).into(),
-                      (&aes256_scheme).into(),
-                      (&aes256_value_scheme).into()
-                  ]
-              ).unwrap().l().unwrap();
+                &encrypted_prefs_class,
+                "create",
+                "(Landroid/content/Context;Ljava/lang/String;Landroidx/security/crypto/MasterKey;Landroidx/security/crypto/EncryptedSharedPreferences$PrefKeyEncryptionScheme;Landroidx/security/crypto/EncryptedSharedPreferences$PrefValueEncryptionScheme;)Landroid/content/SharedPreferences;",
+                &[
+                    JValue::Object(activity), // Use activity JObject
+                    JValue::Object(&pref_file_name),
+                    JValue::Object(&master_key),
+                    JValue::Object(&pref_key_scheme_aes256_siv),
+                    JValue::Object(&pref_value_scheme_aes256_gcm),
+                ],
+            )?.l()?;
 
-            // Edit preferences
+            // Get the SharedPreferences Editor
             let editor = env
                 .call_method(
                     &encrypted_prefs,
                     "edit",
                     "()Landroid/content/SharedPreferences$Editor;",
                     &[],
-                )
-                .unwrap()
-                .l()
-                .unwrap();
+                )?
+                .l()?;
 
-            // Put the value
-            let key_jstring = env.new_string(&key_str).unwrap();
-            let value_jstring = env.new_string(&value_str).unwrap();
+            // Convert Rust strings to Java Strings
+            let key_jstring = env.new_string(&key_str)?;
+            let value_jstring = env.new_string(&value_str)?;
 
+            // Put the key-value pair
             env.call_method(
                 &editor,
                 "putString",
                 "(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences$Editor;",
-                &[(&key_jstring).into(), (&value_jstring).into()],
-            )
-            .unwrap();
+                &[JValue::Object(&key_jstring), JValue::Object(&value_jstring)], // Pass JStrings as JValues containing JObjects
+            )?;
 
-            // Apply changes
-            env.call_method(&editor, "apply", "()V", &[]).unwrap();
+            // Apply the changes asynchronously
+            env.call_method(&editor, "apply", "()V", &[])?;
+
+            Ok(())
         })();
 
-        // Send result back
-        tx.send(()).unwrap();
+        // If sending fails, it means the receiver was dropped, ignore.
+        let _ = tx.send(result);
     });
 
-    rx.recv().unwrap()
+    rx.recv()?
 }
 
-// Function to retrieve a securely stored value
-pub fn secure_retrieve(key: &str) -> Option<String> {
+/// Retrieves a securely stored value using Android EncryptedSharedPreferences.
+/// Returns Ok(None) if the key is not found.
+pub fn secure_retrieve(key: &str) -> Result<Option<String>> {
     let key_str = key.to_string();
-    let (tx, rx) = mpsc::channel();
+    let (tx, rx) = mpsc::channel::<Result<Option<String>>>();
 
-    dispatch(move |env, activity, _webview| {
-        let result = (|| {
-            // Get the context
-            let context = activity.clone();
+    dispatch(move |env: &mut JNIEnv, activity: &JObject, _webview| {
+        let result = (|| -> Result<Option<String>> {
+            // Find Classes
+            let master_key_class = find_class(
+                env,
+                activity,
+                "androidx/security/crypto/MasterKey$Builder".to_string(),
+            )?;
+            let key_scheme_enum = find_class(
+                env,
+                activity,
+                "androidx/security/crypto/MasterKey$KeyScheme".to_string(),
+            )?;
+            let encrypted_prefs_class = find_class(
+                env,
+                activity,
+                "androidx/security/crypto/EncryptedSharedPreferences".to_string(),
+            )?;
+            let pref_key_scheme_enum = find_class(
+                env,
+                activity,
+                "androidx/security/crypto/EncryptedSharedPreferences$PrefKeyEncryptionScheme"
+                    .to_string(),
+            )?;
+            let pref_value_scheme_enum = find_class(
+                env,
+                activity,
+                "androidx/security/crypto/EncryptedSharedPreferences$PrefValueEncryptionScheme"
+                    .to_string(),
+            )?;
 
-            // Get the security library classes
-            let master_key_class = env
-                .find_class("androidx/security/crypto/MasterKey$Builder")
-                .unwrap();
-            let encrypted_prefs_class = env
-                .find_class("androidx/security/crypto/EncryptedSharedPreferences")
-                .unwrap();
+            // Create Master Key Builder
+            let master_key_builder = env.new_object(
+                &master_key_class,
+                "(Landroid/content/Context;)V",
+                &[JValue::Object(activity)], // Pass JObject as JValue
+            )?;
 
-            // Create master key
-            let master_key_builder = env
-                .new_object(
-                    &master_key_class,
-                    "(Landroid/content/Context;)V",
-                    &[context.into()],
-                )
-                .unwrap();
+            // Get MasterKey.KeyScheme.AES256_GCM enum value
+            let key_scheme_aes256_gcm = env
+                .get_static_field(
+                    key_scheme_enum,
+                    "AES256_GCM",
+                    "Landroidx/security/crypto/MasterKey$KeyScheme;",
+                )?
+                .l()?;
 
+            // Set key scheme
+            let master_key_builder = env.call_method( // Re-assign builder
+                 &master_key_builder,
+                 "setKeyScheme",
+                 "(Landroidx/security/crypto/MasterKey$KeyScheme;)Landroidx/security/crypto/MasterKey$Builder;",
+                 &[JValue::Object(&key_scheme_aes256_gcm)],
+             )?.l()?;
+
+            // Build the MasterKey
             let master_key = env
                 .call_method(
                     &master_key_builder,
                     "build",
                     "()Landroidx/security/crypto/MasterKey;",
                     &[],
-                )
-                .unwrap()
-                .l()
-                .unwrap();
+                )?
+                .l()?;
 
-            // Get file name for preferences
-            let pref_file = env.new_string("secure_prefs").unwrap();
+            // Get EncryptedSharedPreferences Settings
+            let pref_file_name = env.new_string("secure_prefs")?;
 
-            // Get encryption schemes
-            let aes256_scheme = env
+            // Get PrefKeyEncryptionScheme.AES256_SIV enum value
+            let pref_key_scheme_aes256_siv = env
                 .get_static_field(
-                    "androidx/security/crypto/EncryptedSharedPreferences$PrefKeyEncryptionScheme",
+                    pref_key_scheme_enum,
                     "AES256_SIV",
                     "Landroidx/security/crypto/EncryptedSharedPreferences$PrefKeyEncryptionScheme;",
-                )
-                .unwrap()
-                .l()
-                .unwrap();
+                )?
+                .l()?;
 
-            let aes256_value_scheme = env.get_static_field(
-                  "androidx/security/crypto/EncryptedSharedPreferences$PrefValueEncryptionScheme",
-                  "AES256_GCM",
-                  "Landroidx/security/crypto/EncryptedSharedPreferences$PrefValueEncryptionScheme;"
-              ).unwrap().l().unwrap();
+            // Get PrefValueEncryptionScheme.AES256_GCM enum value
+            let pref_value_scheme_aes256_gcm = env.get_static_field(
+                 pref_value_scheme_enum,
+                 "AES256_GCM",
+                 "Landroidx/security/crypto/EncryptedSharedPreferences$PrefValueEncryptionScheme;",
+             )?.l()?;
 
-            // Create encrypted preferences
+            // Create EncryptedSharedPreferences
             let encrypted_prefs = env.call_static_method(
-                  &encrypted_prefs_class,
-                  "create",
-                  "(Landroid/content/Context;Ljava/lang/String;Landroidx/security/crypto/MasterKey;Landroidx/security/crypto/EncryptedSharedPreferences$PrefKeyEncryptionScheme;Landroidx/security/crypto
-  /EncryptedSharedPreferences$PrefValueEncryptionScheme;)Landroid/content/SharedPreferences;",
-                  &[
-                      context.into(),
-                      (&pref_file).into(),
-                      (&master_key).into(),
-                      (&aes256_scheme).into(),
-                      (&aes256_value_scheme).into()
-                  ]
-              ).unwrap().l().unwrap();
+                &encrypted_prefs_class,
+                "create",
+                "(Landroid/content/Context;Ljava/lang/String;Landroidx/security/crypto/MasterKey;Landroidx/security/crypto/EncryptedSharedPreferences$PrefKeyEncryptionScheme;Landroidx/security/crypto/EncryptedSharedPreferences$PrefValueEncryptionScheme;)Landroid/content/SharedPreferences;",
+                &[
+                    JValue::Object(activity),
+                    JValue::Object(&pref_file_name),
+                    JValue::Object(&master_key),
+                    JValue::Object(&pref_key_scheme_aes256_siv),
+                    JValue::Object(&pref_value_scheme_aes256_gcm),
+                ],
+            )?.l()?; // Extract JObject (SharedPreferences)
 
-            // Get the value
-            let key_jstring = env.new_string(&key_str).unwrap();
-            let default_value = env.new_string("").unwrap();
+            let key_jstring: JString = env.new_string(&key_str)?; // Borrow is fine
+            let key_jobject: JObject = key_jstring.into(); // Convert JString to JObject for calls needing Objects
 
-            let value = env
+            // Check if key exists
+            let contains_key = env
                 .call_method(
+                    &encrypted_prefs,
+                    "contains",
+                    "(Ljava/lang/String;)Z",
+                    &[JValue::Object(&key_jobject)],
+                )?
+                .z()?;
+
+            // Key not found
+            if !contains_key {
+                return Ok(None);
+            }
+
+            // Retrieve the value
+            let default_value_jstring = env.new_string("")?;
+            let default_value: JObject = default_value_jstring.into();
+
+            let value_jobject = env
+                .call_method(
+                    // Borrow is fine
                     &encrypted_prefs,
                     "getString",
                     "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
-                    &[(&key_jstring).into(), (&default_value).into()],
-                )
-                .unwrap()
-                .l()
-                .unwrap();
+                    &[JValue::Object(&key_jobject), JValue::Object(&default_value)],
+                )?
+                .l()?;
 
-            // Convert to Rust String
-            if value.is_null() {
-                None
+            if value_jobject.is_null() {
+                println!(
+                    "Warning: key '{}' exists but getString returned null.",
+                    key_str
+                );
+                Ok(None)
             } else {
-                let value_str = env
-                    .get_string((&value).into())
-                    .unwrap()
+                // Convert Java String JObject to Rust String
+                let value_jstring: JString = value_jobject.into();
+                let value_rust_string = env
+                    .get_string(&value_jstring)?
                     .to_string_lossy()
-                    .to_string();
-                if value_str.is_empty() {
-                    None
-                } else {
-                    Some(value_str)
-                }
+                    .into_owned();
+                Ok(Some(value_rust_string))
             }
         })();
 
-        // Send result back
-        tx.send(result).unwrap();
+        let _ = tx.send(result);
     });
 
-    rx.recv().unwrap()
+    rx.recv()?
 }

@@ -1,15 +1,9 @@
-// TODO: need to add to the build.gradle file
-// dependencies {
-//     implementation "androidx.security:security-crypto:1.1.0-alpha07"
-// }
-
 use dioxus::{
     hooks::use_signal,
     signals::{Readable, Signal, Writable},
 };
 use serde::{de::DeserializeOwned, Serialize};
 
-#[cfg(target_os = "android")]
 mod android;
 mod store;
 
