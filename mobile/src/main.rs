@@ -7,6 +7,7 @@ mod components;
 mod storage;
 mod views;
 
+use components::container::FixedSizeContainer;
 use views::auth::Route as AuthRoute;
 use views::dashboard::Route as DashboardRoute;
 
@@ -83,7 +84,8 @@ fn App() -> Element {
         style {
             "@font-face {{ font-family: 'Source Serif 4'; font-style: italic; src: url({SOURCE_SERIF_4_ITALIC}); }}"
         }
-
-        Router::<AuthRoute> {}
+        FixedSizeContainer {
+            Router::<AuthRoute> {}
+        }
     }
 }

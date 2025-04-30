@@ -23,7 +23,7 @@ pub fn SignUp() -> Element {
             align: "stretch",
             cross_align: "space-evenly",
 
-            height: "100vh",
+            height: "100%",
             width: "100%",
             max_width: "300px",
             margin: "auto",

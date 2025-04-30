@@ -5,10 +5,10 @@ use crate::views::auth::Route;
 use super::components::Header;
 use ui::{
     forms::{
-        button::{SolidButton, TransparentButton, UnstyledButton},
+        button::{SolidButton, TransparentButton},
         input::Input,
     },
-    icons::{AppleIcon, EnvelopeIcon, GoogleIcon, LockIcon, UserIcon},
+    icons::{AppleIcon, GoogleIcon, LockIcon, UserIcon},
     layout::Column,
 };
 
@@ -22,7 +22,7 @@ pub fn Login() -> Element {
             align: "stretch",
             cross_align: "space-evenly",
 
-            height: "100vh",
+            height: "100%",
             width: "100%",
             max_width: "300px",
             margin: "auto",
@@ -73,7 +73,9 @@ pub fn Login() -> Element {
                 // Actions
                 Column { gap: "12px", align: "stretch",
 
-                    SolidButton { onclick: move |_| {}, "Login" }
+                    SolidButton { onclick: move |_| {
+
+                    }, "Login" }
                     TransparentButton { onclick: move |_| {}, "Reset Password" }
                     TransparentButton {
                         onclick: move |_| {
