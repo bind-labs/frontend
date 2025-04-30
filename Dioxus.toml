@@ -1,0 +1,12 @@
+[application]
+
+[web.app]
+
+[web.watcher]
+
+[web.resource]
+
+[web.resource.dev]
+
+[bundle.android]
+dependencies = ["androidx.security:security-crypto:1.1.0-alpha06"]

@@ -45,7 +45,12 @@
       in {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            dioxus-cli
+            # Building dioxus cli
+            openssl
+            libiconv
+            pkg-config
+
+            # Using dioxus cli
             wasm-bindgen-cli_0_2_100
             (pkgs.fenix.fromToolchainFile {
               file = ./rust-toolchain.toml;
