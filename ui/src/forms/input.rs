@@ -65,32 +65,30 @@ pub fn Input(props: Props) -> Element {
     });
 
     rsx! {
-      div {
-        display: "flex",
-        position: "relative",
+        div { display: "flex", position: "relative",
 
-        {title}
-        {icon}
+            {title}
+            {icon}
 
-        input {
-          padding: "12px",
-          padding_left: match props.icon_position {
-            Some(IconPosition::Left) => "calc(16px + 24px + 12px)",
-            _ => "16px",
-          },
-          padding_right: match props.icon_position {
-            Some(IconPosition::Right) => "calc(16px + 24px + 12px)",
-            _ => "16px",
-          },
-          flex_grow: "1",
-          height: "48px",
-          background_color: "transparent",
-          color: "#000000",
-          border: "1px solid black",
-          outline: "none",
-          onchange: move |ev| props.onchange.call(ev.value().clone()),
-          ..props.attributes
+            input {
+                padding: "12px",
+                padding_left: match props.icon_position {
+                    Some(IconPosition::Left) => "calc(16px + 24px + 12px)",
+                    _ => "16px",
+                },
+                padding_right: match props.icon_position {
+                    Some(IconPosition::Right) => "calc(16px + 24px + 12px)",
+                    _ => "16px",
+                },
+                flex_grow: "1",
+                height: "48px",
+                background_color: "transparent",
+                color: "#000000",
+                border: "1px solid black",
+                outline: "none",
+                onchange: move |ev| props.onchange.call(ev.value().clone()),
+                ..props.attributes,
+            }
         }
-      }
     }
 }

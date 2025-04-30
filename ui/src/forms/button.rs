@@ -23,11 +23,7 @@ pub fn SolidButton(props: ButtonProps) -> Element {
 #[component]
 pub fn UnstyledButton(props: ButtonProps) -> Element {
     rsx! {
-        button {
-            onclick: move |evt| props.onclick.call(evt),
-            ..props.attributes,
-            {props.children}
-        }
+        button { onclick: move |evt| props.onclick.call(evt), ..props.attributes, {props.children} }
     }
 }
 

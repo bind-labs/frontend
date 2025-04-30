@@ -38,33 +38,44 @@ fn DashboardLayout() -> Element {
             height: "100vh",
             width: "100vw",
 
-            Header { title: "Read Later", additional: Some("(16 items)".to_string()), onsettings: move || tracing::info!("Settings clicked") }
-
-            main {
-                overflow: "auto",
-                Outlet::<Route> {}
+            Header {
+                title: "Read Later",
+                additional: Some("(16 items)".to_string()),
+                onsettings: move || tracing::info!("Settings clicked"),
             }
+
+            main { overflow: "auto", Outlet::<Route> {} }
 
             Navbar {
                 NavbarButton {
                     to: Route::Search {},
-                    icon: |solid| rsx! { SearchIcon { solid } }
+                    icon: |solid| rsx! {
+                        SearchIcon { solid }
+                    },
                 }
                 NavbarButton {
                     to: Route::Feed {},
-                    icon: |solid| rsx! { QueueIcon { solid } }
+                    icon: |solid| rsx! {
+                        QueueIcon { solid }
+                    },
                 }
                 NavbarButton {
                     to: Route::List {},
-                    icon: |solid| rsx! { PlusIcon { solid } }
+                    icon: |solid| rsx! {
+                        PlusIcon { solid }
+                    },
                 }
                 NavbarButton {
                     to: Route::List {},
-                    icon: |solid| rsx! { BookmarkIcon { solid } }
+                    icon: |solid| rsx! {
+                        BookmarkIcon { solid }
+                    },
                 }
                 NavbarButton {
                     to: Route::List {},
-                    icon: |solid| rsx! { Bars3Icon { solid } }
+                    icon: |solid| rsx! {
+                        Bars3Icon { solid }
+                    },
                 }
             }
         }

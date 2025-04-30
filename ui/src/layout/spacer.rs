@@ -26,10 +26,12 @@ pub fn Spacer(props: Props) -> Element {
         _ => "".to_string(),
     };
 
-    rsx!(div {
-        align_self: "stretch",
-        flex_grow: 1.0,
-        flex_shrink: 1.0,
-        style: "{style}"
-    })
+    rsx!(
+        div {
+            align_self: "stretch",
+            flex_grow: 1.0,
+            flex_shrink: 1.0,
+            style: "{style}",
+        }
+    )
 }

@@ -28,38 +28,25 @@ pub fn Login() -> Element {
             margin: "auto",
             padding: "36px 16px",
 
-            Header {
-                subtitle: "Welcome back to",
-                title: "Bind",
-            }
+            Header { subtitle: "Welcome back to", title: "Bind" }
 
             // OAuth
-            Column {
-                gap: "24px",
+            Column { gap: "24px",
 
-                button {
-                    class: "solid",
-                    onclick: move |_| {
-                        // login
-                    },
-                    GoogleIcon {},
-                    "Login with Google",
-                },
-                button {
-                    class: "solid",
-                    onclick: move |_| {
-                        // redirect to apple oauth
-                    },
-                    AppleIcon {},
-                    "Login with Apple",
+                button { class: "solid", onclick: move |_| {},
+                    GoogleIcon {}
+                    "Login with Google"
+                }
+                button { class: "solid", onclick: move |_| {},
+                    AppleIcon {}
+                    "Login with Apple"
                 }
             }
 
             hr { width: "100px" }
 
             // Form
-            Column {
-                gap: "24px",
+            Column { gap: "24px",
 
                 Input {
                     title: "Email or Username",
@@ -69,8 +56,8 @@ pub fn Login() -> Element {
                     },
                     onchange: move |value| {
                         email_or_username.set(value);
-                    }
-                },
+                    },
+                }
                 Input {
                     title: "Password",
                     placeholder: "Password",
@@ -80,31 +67,19 @@ pub fn Login() -> Element {
                     password: true,
                     onchange: move |value| {
                         password.set(value);
-                    }
+                    },
                 }
 
                 // Actions
-                Column {
-                    gap: "12px",
-                    align: "stretch",
+                Column { gap: "12px", align: "stretch",
 
-                    SolidButton {
-                        onclick: move |_| {
-                            // login
-                        },
-                        "Login",
-                    },
-                    TransparentButton {
-                        onclick: move |_| {
-                            // reset password
-                        },
-                        "Reset Password",
-                    },
+                    SolidButton { onclick: move |_| {}, "Login" }
+                    TransparentButton { onclick: move |_| {}, "Reset Password" }
                     TransparentButton {
                         onclick: move |_| {
                             navigator().push(Route::SignUp {});
                         },
-                        "Sign up",
+                        "Sign up"
                     }
                 }
             }

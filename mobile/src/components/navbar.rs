@@ -19,7 +19,9 @@ pub fn NavbarButton<Route: Routable + PartialEq + Copy>(
             flex_grow: "1",
             padding: "0px 12px",
 
-            onclick: move |_| { navigator().push(to); },
+            onclick: move |_| {
+                navigator().push(to);
+            },
 
             {icon(current_route == to)}
         }
