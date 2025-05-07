@@ -2,6 +2,8 @@ use serde::{de::DeserializeOwned, Serialize};
 
 #[cfg(target_os = "android")]
 use super::android::*;
+#[cfg(target_os = "ios")]
+use super::ios::*;
 
 use std::{
     cell::LazyCell,

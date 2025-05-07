@@ -4,7 +4,9 @@ use dioxus::{
 };
 use serde::{de::DeserializeOwned, Serialize};
 
+#[cfg(target_os = "android")]
 mod android;
+mod ios;
 mod store;
 
 use store::SecureStore;
