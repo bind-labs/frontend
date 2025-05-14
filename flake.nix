@@ -1,3 +1,5 @@
+# TODO: add `cargo install --git https://github.com/bind-labs/dioxus --branch android-perms-deps dioxus-cli`
+
 {
   description = "Bind Frontend";
 
