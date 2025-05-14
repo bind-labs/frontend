@@ -39,21 +39,17 @@ pub fn ReaderLayout() -> Element {
             height: "100vh",
             width: "100vw",
 
-            main { overflow: "auto",
-
-            padding: "16px",
-             Outlet::<Route> {} }
+            main { overflow: "auto", padding: "16px", Outlet::<Route> {} }
 
             Navbar {
-                NavbarButtonWithoutRoute {
-                    onclick: move |_| {},
+                NavbarButtonWithoutRoute { onclick: move |_| {},
                     span {
                         font_family: "IBM Plex Mono",
                         font_size: "24px",
                         line_height: "20px",
                         "Aa"
                     }
-
+                
                 }
                 NavbarButton {
                     to: Route::FeedReader {},
@@ -75,12 +71,11 @@ pub fn ReaderLayout() -> Element {
                 }
                 NavbarButtonWithoutRoute {
                     onclick: move |_| {
-                         share_feed_item("https://example.com".to_string(), "testing".to_string());
+                        share_feed_item("https://example.com".to_string(), "testing".to_string());
                     },
                     ShareIcon {
-
                     }
-
+                
                 }
             }
         }

@@ -1,7 +1,4 @@
 body {
-  --bg: hsla(40, 37%, 92%, 1);
-  --fg: black;
-
   background-color: var(--bg);
   color: var(--fg);
   margin: 0;
@@ -42,8 +39,8 @@ button {
 }
 
 button.solid {
-  background-color: black;
-  color: white;
+  background-color: var(--text);
+  color: var(--bg);
 }
 
 button.transparent {

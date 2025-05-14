@@ -14,7 +14,6 @@ pub fn ParsedReader() -> Element {
             duration: "4 min read",
         }
         ReaderDocumentHtml {
-
         }
     }
 }

@@ -84,7 +84,7 @@ pub fn Input(props: Props) -> Element {
                 height: "48px",
                 background_color: "transparent",
                 color: "#000000",
-                border: "1px solid black",
+                border: "1px solid var(--text)",
                 outline: "none",
                 onchange: move |ev| props.onchange.call(ev.value().clone()),
                 ..props.attributes,

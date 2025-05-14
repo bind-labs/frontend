@@ -37,7 +37,7 @@ pub fn NavbarButtonWithoutRoute(children: Element, onclick: EventHandler<MouseEv
             justify_content: "center",
             flex_grow: "1",
             padding: "0px 12px",
-            onclick: onclick,
+            onclick,
             {children}
         }
     }

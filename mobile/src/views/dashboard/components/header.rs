@@ -11,7 +11,7 @@ pub fn Header(title: String, additional: Option<String>, onsettings: EventHandle
             padding: "14px 16px",
             justify_content: "space-between",
             align_items: "center",
-            border_bottom: "1px solid black",
+            border_bottom: "1px solid var(--text)",
 
             Row { gap: "8px", cross_align: "baseline",
                 span { font_size: "18px", font_weight: 600, "{title}" }

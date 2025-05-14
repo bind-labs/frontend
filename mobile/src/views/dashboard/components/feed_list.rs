@@ -25,17 +25,27 @@ pub fn FeedListItem(props: FeedListItemProps) -> Element {
     rsx! {
         Row {
             padding: "10px 16px",
-            border_bottom: "1px solid #666",
+            border_bottom: "1px solid var(--text-secondary)",
             gap: "12px",
             cross_align: "center",
 
             img { src: image_url, width: "80px", height: "80px" }
             Column { gap: "2px",
-                span { font_size: "16px", color: if unread { "#000" } else { "#888" }, "{title}" }
-                span { font_size: "12px", color: if unread { "#666" } else { "#888" },
+                span {
+                    font_size: "16px",
+                    color: if unread { "var(--text)" } else { "var(--text-tertiary)" },
+                    "{title}"
+                }
+                span {
+                    font_size: "12px",
+                    color: if unread { "var(--text-secondary)" } else { "var(--text-tertiary)" },
                     "({feed_name}) {created_at}"
                 }
-                span { font_size: "12px", color: if unread { "#666" } else { "#888" }, "{description}" }
+                span {
+                    font_size: "12px",
+                    color: if unread { "var(--text-secondary)" } else { "var(--text-tertiary)" },
+                    "{description}"
+                }
             }
         }
     }

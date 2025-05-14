@@ -4,6 +4,7 @@ use dioxus::mobile::{use_window, Config, WindowBuilder};
 use dioxus::prelude::*;
 
 mod components;
+mod platform;
 mod share;
 mod storage;
 mod views;
@@ -13,6 +14,7 @@ use views::auth::Route as AuthRoute;
 use views::dashboard::Route as DashboardRoute;
 use views::reader::Route as ReaderRoute;
 
+const THEME_CSS: Asset = asset!("/assets/theme.css");
 const MAIN_CSS: Asset = asset!("/assets/main.css");
 const SOURCE_SERIF_4_ITALIC: Asset = asset!("/assets/fonts/SourceSerif4Variable-Italic.otf.woff2");
 const SOURCE_SERIF_4_ROMAN: Asset = asset!("/assets/fonts/SourceSerif4Variable-Roman.otf.woff2");
@@ -24,68 +26,15 @@ fn main() {
         .launch(App);
 }
 
-#[cfg(target_os = "android")]
-fn set_android_flags() {
-    if cfg!(target_os = "android") {
-        use dioxus::mobile::wry::prelude::dispatch;
-        // TODO: remove unwraps
-        dispatch(|env, activity, _webview| {
-            // Get the window
-            let window = env
-                .call_method(activity, "getWindow", "()Landroid/view/Window;", &[])
-                .unwrap()
-                .l()
-                .unwrap();
-
-            // Set window flags
-            const FLAG_KEEP_SCREEN_ON: i32 = 128;
-            env.call_method(&window, "addFlags", "(I)V", &[FLAG_KEEP_SCREEN_ON.into()])
-                .unwrap();
-
-            // Use dark icons for status bar
-            let insets_controller = env
-                .call_method(
-                    &window,
-                    "getInsetsController",
-                    "()Landroid/view/WindowInsetsController;",
-                    &[],
-                )
-                .unwrap()
-                .l()
-                .unwrap();
-
-            if !insets_controller.is_null() {
-                let appearance_flag = 0x00000008; // APPEARANCE_LIGHT_STATUS_BARS
-                env.call_method(
-                    &insets_controller,
-                    "setSystemBarsAppearance",
-                    "(II)V",
-                    &[appearance_flag.into(), appearance_flag.into()],
-                )
-                .unwrap();
-            }
-
-            // Set status bar color
-            let color = 0xFFF2EDE3u32 as i32; // ARGB
-            env.call_method(&window, "setStatusBarColor", "(I)V", &[color.into()])
-                .unwrap();
-
-            // Set navigation bar color
-            env.call_method(&window, "setNavigationBarColor", "(I)V", &[color.into()])
-                .unwrap();
-        });
-    }
-}
-
 #[component]
 fn App() -> Element {
     use_effect(|| {
-        #[cfg(target_os = "android")]
-        set_android_flags();
+        platform::setup_platform();
     });
 
     rsx! {
         // Global app resources
+        document::Link { rel: "stylesheet", href: THEME_CSS }
         document::Link { rel: "stylesheet", href: MAIN_CSS }
         style { "@font-face {{ font-family: 'Source Serif 4'; src: url({SOURCE_SERIF_4_ROMAN}); }}" }
         style {
