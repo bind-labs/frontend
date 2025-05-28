@@ -1,3 +1,5 @@
+use api::types::auth::AuthUser;
+use api::ApiClient;
 use dioxus::dioxus_core::LaunchConfig;
 use dioxus::mobile::wry::WebView;
 use dioxus::mobile::{use_window, Config, WindowBuilder};
@@ -25,6 +27,16 @@ fn main() {
     dioxus::LaunchBuilder::mobile()
         .with_cfg(Config::new().with_background_color((0xF2, 0xED, 0xE3, 0xFF)))
         .launch(App);
+}
+
+#[derive(Clone)]
+struct AuthContext {
+    user: Option<AuthUser>,
+}
+
+#[derive(Clone)]
+struct AppContext {
+    api_client: ApiClient,
 }
 
 #[component]

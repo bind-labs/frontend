@@ -5,7 +5,10 @@ use reqwest::{
 use std::time::Duration;
 use thiserror::Error;
 use types::{
-    auth::{EmailVerificationRequest, UserRegisterRequest, UserRegisterResponse},
+    auth::{
+        EmailVerificationRequest, UserLoginRequest, UserLoginResponse, UserRegisterRequest,
+        UserRegisterResponse,
+    },
     feed::{CreateFeedRequest, Feed},
 };
 
@@ -26,6 +29,7 @@ pub enum ApiClientError {
     },
 }
 
+#[derive(Clone)]
 pub struct ApiClient {
     client: reqwest::Client,
     pub base_url: String,
@@ -165,6 +169,39 @@ impl ApiClient {
         if status == reqwest::StatusCode::OK {
             Ok(())
         } else {
+            let error_message = response
+                .text()
+                .await
+                .unwrap_or_else(|e| format!("Could not retrieve error body: {}", e));
+            Err(ApiClientError::ApiError {
+                status_code: status.as_u16(),
+                error_message,
+            })
+        }
+    }
+
+    /// Login with email/username and password.
+    ///
+    /// Corresponds to `POST /user/email/login`.
+    /// This endpoint does not require prior authentication.
+    ///
+    /// # Arguments
+    /// * `login_data` - The user's login credentials.
+    pub async fn login_user(&self, login_data: &UserLoginRequest) -> Result<UserLoginResponse> {
+        let response = self
+            .make_request(reqwest::Method::POST, "/user/email/login")
+            .json(login_data)
+            .send()
+            .await?;
+
+        let status = response.status();
+
+        if status == reqwest::StatusCode::OK {
+            // 200 OK for successful login
+            let login_response = response.json::<UserLoginResponse>().await?;
+            Ok(login_response)
+        } else {
+            // Handle API errors (400, 401, 500 from the spec)
             let error_message = response
                 .text()
                 .await

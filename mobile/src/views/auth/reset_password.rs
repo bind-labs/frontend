@@ -15,7 +15,7 @@ use ui::{
 
 #[component]
 pub fn ResetPassword() -> Element {
-    let mut email_sent = use_signal(|| false);
+    let mut email_sent = use_signal(|| true);
     let mut email = use_signal(String::new);
     let mut password = use_signal(String::new);
     let mut code = use_signal(String::new);
@@ -23,10 +23,9 @@ pub fn ResetPassword() -> Element {
         Column {
             height: "100%",
             width: "100%",
-            max_width: "300px",
             margin: "auto",
-            padding: "36px 16px",
             gap: "16px",
+            align: "center",
             Header {
                 title: "Password",
                 subtitle: "Reset your",
@@ -36,30 +35,39 @@ pub fn ResetPassword() -> Element {
                     }
                 }
             }
-            Input {
-                title: "Email",
-                placeholder: "Email",
-                icon: rsx! {
-                    EnvelopeIcon{}
-                },
-                onchange: move |value| email.set(value),
-            }
-
-            if email_sent() {
+            Column {
+                max_width: "300px",
+                width: "100%",
+                gap: "16px",
+                padding:"36px 16px",
                 Input {
-                    title: "Password",
-                    placeholder: "Password",
+                    title: "Email",
+                    placeholder: "Email",
                     icon: rsx! {
-                        LockIcon{}
+                        EnvelopeIcon{}
                     },
-                    onchange: move |value| password.set(value),
+                    onchange: move |value| email.set(value),
+                }
+
+                if email_sent() {
+                    Input {
+                        title: "Password",
+                        placeholder: "Password",
+                        icon: rsx! {
+                            LockIcon{}
+                        },
+                        onchange: move |value| password.set(value),
+                    }
                 }
             }
 
-            CodeInput {
-                length: 5,
-                onchange: move |value| code.set(value),
+            if email_sent() {
+                CodeInput {
+                    length: 5,
+                    onchange: move |value| code.set(value),
+                }
             }
+
 
             SolidButton { onclick: move |_| {
                 if email_sent() {
