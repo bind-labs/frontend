@@ -4,14 +4,19 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+chrono = { version = "0.4.41", features = ["serde"] }
 dioxus = { workspace = true, features = ["router"] }
 jni = "0.21.1"
+reqwest = { version = "0.12.15", default-features = false, features = [
+    "json",
+    "rustls-tls",
+] }
 serde = "1.0.219"
 serde_json = "1.0.140"
+thiserror = "2.0.12"
 tracing.workspace = true
 ui.workspace = true
 
 [features]
 default = ["mobile"]
 mobile = ["dioxus/mobile"]
-

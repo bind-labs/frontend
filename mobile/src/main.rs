@@ -3,6 +3,7 @@ use dioxus::mobile::wry::WebView;
 use dioxus::mobile::{use_window, Config, WindowBuilder};
 use dioxus::prelude::*;
 
+mod api;
 mod components;
 mod platform;
 mod share;
@@ -44,7 +45,7 @@ fn App() -> Element {
             "@font-face {{ font-family: 'IBM Plex Mono'; font-style: italic; src: url({IBM_PLEX_MONO}); }}"
         }
         FixedSizeContainer {
-            if false {
+            if true {
                 Router::<AuthRoute> {}
             } else {
                 Router::<ReaderRoute> {}

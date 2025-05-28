@@ -5,15 +5,25 @@ use ui::layout::Column;
 pub struct Props {
     subtitle: String,
     title: String,
+    icon: Option<Element>,
 }
 
 #[component]
 pub fn Header(props: Props) -> Element {
+    let icon = props.icon.map(|icon| -> Element {
+        rsx! {
+            div {
+                {icon}
+            }
+        }
+    });
     rsx! {
         Column {
             align: "center",
             cross_align: "center",
             margin: "0px 0px 24px 0px",
+
+            {icon}
 
             h2 {
                 font_size: "30px",

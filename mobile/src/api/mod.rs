@@ -1,1 +1,178 @@
+use reqwest::{
+    header::{HeaderMap, HeaderValue},
+    Method,
+};
+use std::time::Duration;
+use thiserror::Error;
+use types::{
+    auth::{EmailVerificationRequest, UserRegisterRequest, UserRegisterResponse},
+    feed::{CreateFeedRequest, Feed},
+};
+
 pub mod types;
+
+#[derive(Error, Debug)]
+pub enum ApiClientError {
+    #[error("Reqwest error: {0}")]
+    ReqwestError(#[from] reqwest::Error),
+    #[error("Serde error: {0}")]
+    SerdeError(#[from] serde_json::Error),
+    #[error("Auth error: {0}")]
+    AuthError(String),
+    #[error("API error: (Status: {status_code}): {error_message}")]
+    ApiError {
+        status_code: u16,
+        error_message: String,
+    },
+}
+
+pub struct ApiClient {
+    client: reqwest::Client,
+    pub base_url: String,
+    auth_token: Option<String>,
+}
+
+type Result<T> = std::result::Result<T, ApiClientError>;
+
+impl ApiClient {
+    pub fn new(base_url: String) -> Self {
+        let mut headers = HeaderMap::new();
+        headers.insert("Content-Type", HeaderValue::from_static("application/json"));
+        // make this dynamic
+        headers.insert("User-Agent", HeaderValue::from_static("bind-app/1.0"));
+        let client_builder = reqwest::ClientBuilder::new()
+            .default_headers(headers)
+            .timeout(Duration::from_secs(60));
+        Self {
+            client: client_builder.build().unwrap(),
+            base_url,
+            auth_token: None,
+        }
+    }
+
+    pub fn set_auth_token(&mut self, token: String) {
+        self.auth_token = Some(token);
+    }
+
+    pub fn clear_auth_token(&mut self) {
+        self.auth_token = None;
+    }
+
+    pub fn get_reqwest_client(&self) -> &reqwest::Client {
+        &self.client
+    }
+
+    fn make_request(&self, method: Method, path: &str) -> reqwest::RequestBuilder {
+        let mut request = self.client.request(
+            method,
+            format!("{}/{}", self.base_url, path.trim_start_matches("/")),
+        );
+        if let Some(token) = &self.auth_token {
+            request = request.bearer_auth(token);
+        }
+        request
+    }
+
+    /// Create a new feed subscription.
+    ///
+    /// Corresponds to `PUT /feed`.
+    /// Requires authentication.
+    ///
+    /// # Arguments
+    /// * `feed_data` - The data for the new feed, primarily its URL.
+    pub async fn create_feed(&self, feed_data: &CreateFeedRequest) -> Result<Feed> {
+        let response = self
+            .make_request(Method::PUT, "/feed")
+            .json(feed_data) // Serialize feed_data to JSON and set as body
+            .send()
+            .await?;
+
+        if response.status() == reqwest::StatusCode::CREATED {
+            let created_feed = response.json::<Feed>().await?;
+            Ok(created_feed)
+        } else {
+            // Handle API errors (4xx, 5xx)
+            let status = response.status();
+            // Attempt to get error message from response body
+            let error_message = response
+                .text()
+                .await
+                .unwrap_or_else(|_| "Could not retrieve error body".to_string());
+            Err(ApiClientError::ApiError {
+                status_code: status.as_u16(),
+                error_message,
+            })
+        }
+    }
+
+    /// Register a new user with email and password.
+    ///
+    /// Corresponds to `POST /user/email/register`.
+    /// This endpoint does not require prior authentication.
+    ///
+    /// # Arguments
+    /// * `registration_data` - The user's registration details.
+    pub async fn register_user(
+        &self,
+        registration_data: &UserRegisterRequest,
+    ) -> Result<UserRegisterResponse> {
+        let response = self
+            .make_request(Method::POST, "/user/email/register")
+            .json(registration_data)
+            .send()
+            .await?;
+
+        let status = response.status();
+
+        if status == reqwest::StatusCode::OK {
+            // 200 OK for successful registration
+            let register_response = response.json::<UserRegisterResponse>().await?;
+            Ok(register_response)
+        } else {
+            // Handle API errors (400, 403, 409, 500)
+            let error_message = response
+                .text()
+                .await
+                .unwrap_or_else(|e| format!("Could not retrieve error body: {}", e));
+            Err(ApiClientError::ApiError {
+                status_code: status.as_u16(),
+                error_message,
+            })
+        }
+    }
+
+    /// Sends an email to the user with a verification code
+    /// which must be used during registration.
+    ///
+    /// Corresponds to `POST /user/email/verify`.
+    /// This endpoint does not require prior authentication.
+    ///
+    /// # Arguments
+    /// * `verification_request_data` - The email to send the verification code to.
+    pub async fn send_email_verification(
+        &self,
+        verification_request_data: &EmailVerificationRequest,
+    ) -> Result<()> {
+        // Returns Ok(()) on success
+        let response = self
+            .make_request(reqwest::Method::POST, "/user/email/verify")
+            .json(verification_request_data)
+            .send()
+            .await?;
+
+        let status = response.status();
+
+        if status == reqwest::StatusCode::OK {
+            Ok(())
+        } else {
+            let error_message = response
+                .text()
+                .await
+                .unwrap_or_else(|e| format!("Could not retrieve error body: {}", e));
+            Err(ApiClientError::ApiError {
+                status_code: status.as_u16(),
+                error_message,
+            })
+        }
+    }
+}
