@@ -7,6 +7,7 @@ use dioxus::prelude::*;
 
 mod api;
 mod components;
+mod hooks;
 mod platform;
 mod share;
 mod storage;

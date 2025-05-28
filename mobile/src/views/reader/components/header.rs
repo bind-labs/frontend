@@ -1,4 +1,4 @@
-use dioxus::{prelude::*};
+use dioxus::prelude::*;
 use ui::layout::{Column, Row};
 
 #[derive(Props, Clone, PartialEq)]

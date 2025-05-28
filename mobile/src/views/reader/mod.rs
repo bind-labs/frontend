@@ -49,7 +49,6 @@ pub fn ReaderLayout() -> Element {
                         line_height: "20px",
                         "Aa"
                     }
-                
                 }
                 NavbarButton {
                     to: Route::FeedReader {},
@@ -75,7 +74,6 @@ pub fn ReaderLayout() -> Element {
                     },
                     ShareIcon {
                     }
-                
                 }
             }
         }

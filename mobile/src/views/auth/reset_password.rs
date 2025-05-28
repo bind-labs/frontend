@@ -30,21 +30,19 @@ pub fn ResetPassword() -> Element {
                 title: "Password",
                 subtitle: "Reset your",
                 icon: rsx! {
-                    LockIcon {
-                        size: 82
-                    }
-                }
+                    LockIcon { size: 82 }
+                },
             }
             Column {
                 max_width: "300px",
                 width: "100%",
                 gap: "16px",
-                padding:"36px 16px",
+                padding: "36px 16px",
                 Input {
                     title: "Email",
                     placeholder: "Email",
                     icon: rsx! {
-                        EnvelopeIcon{}
+                        EnvelopeIcon {}
                     },
                     onchange: move |value| email.set(value),
                 }
@@ -54,7 +52,7 @@ pub fn ResetPassword() -> Element {
                         title: "Password",
                         placeholder: "Password",
                         icon: rsx! {
-                            LockIcon{}
+                            LockIcon {}
                         },
                         onchange: move |value| password.set(value),
                     }
@@ -62,21 +60,13 @@ pub fn ResetPassword() -> Element {
             }
 
             if email_sent() {
-                CodeInput {
-                    length: 5,
-                    onchange: move |value| code.set(value),
-                }
+                CodeInput { length: 5, onchange: move |value| code.set(value) }
             }
 
 
-            SolidButton { onclick: move |_| {
-                if email_sent() {
-
-                } else {
-                    // actually send email
-                    email_sent.set(true)
-                }
-            }, "Reset Password" }
+            SolidButton { onclick: move |_| { if email_sent() {} else { email_sent.set(true) } },
+                "Reset Password"
+            }
 
             TransparentButton {
 
@@ -84,9 +74,7 @@ pub fn ResetPassword() -> Element {
                     navigator().push(Route::Login {});
                 },
                 "Login"
-
             }
-
         }
     }
 }

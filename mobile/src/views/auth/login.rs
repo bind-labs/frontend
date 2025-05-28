@@ -74,9 +74,12 @@ pub fn Login() -> Element {
                 Column { gap: "12px", align: "stretch",
 
                     SolidButton { onclick: move |_| {}, "Login" }
-                    TransparentButton { onclick: move |_| {
-                        navigator().push(Route::ResetPassword {});
-                    }, "Reset Password" }
+                    TransparentButton {
+                        onclick: move |_| {
+                            navigator().push(Route::ResetPassword {});
+                        },
+                        "Reset Password"
+                    }
                     TransparentButton {
                         onclick: move |_| {
                             navigator().push(Route::SignUp {});

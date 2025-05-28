@@ -12,9 +12,7 @@ pub struct Props {
 pub fn Header(props: Props) -> Element {
     let icon = props.icon.map(|icon| -> Element {
         rsx! {
-            div {
-                {icon}
-            }
+            div { {icon} }
         }
     });
     rsx! {
