@@ -1,19 +1,22 @@
-use crate::views::reader::components::document::ReaderDocumentHtml;
-
-use super::components::header::Header;
 use dioxus::prelude::*;
+use ui::layout::Column;
 
-#[allow(non_snake_case)]
+use super::components::{Byline, ReaderDocumentHtml, Title};
+
+#[component]
 pub fn ParsedReader() -> Element {
     rsx! {
-        Header {
-            title: "Is it Lunacy to Put a Data Center on the Moon?",
-            source: "Ieee Spectrum",
-            author: "Dina Genkina",
-            published_at: "26 Feb 2025",
-            duration: "4 min read",
-        }
-        ReaderDocumentHtml {
+        Column { cross_align: "center", gap: "12px",
+            Title {
+                title: "Is it Lunacy to Put a Data Center on the Moon?",
+                source: "Ieee Spectrum",
+            }
+            Byline {
+                author: "Dina Genkina",
+                published_at: "26 Feb 2025",
+                duration: "4 min read",
+            }
+            ReaderDocumentHtml {}
         }
     }
 }

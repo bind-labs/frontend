@@ -35,7 +35,7 @@ pub fn ReaderLayout() -> Element {
     rsx! {
         div {
             display: "grid",
-            grid_template_rows: "auto 1fr auto",
+            grid_template_rows: "1fr auto",
             height: "100vh",
             width: "100vw",
 

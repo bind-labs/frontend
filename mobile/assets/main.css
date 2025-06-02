@@ -11,6 +11,16 @@ body {
   box-sizing: border-box;
 }
 
+a {
+  color: var(--text);
+}
+
+blockquote {
+  border-left: 2px solid var(--text);
+  padding-left: 8px;
+  margin: 0px 8px;
+}
+
 hr {
   background-color: var(--fg);
   height: 2px;

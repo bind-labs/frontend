@@ -41,6 +41,7 @@ pub struct Props {
     pub gap: Option<String>,
     #[props(into)]
     pub padding: Option<String>,
+
     #[props(into)]
     pub margin: Option<String>,
 
@@ -107,6 +108,7 @@ pub fn Column(props: Props) -> Element {
 
             gap: props.gap,
             padding: props.padding,
+
             margin: props.margin,
 
             border: props.border,
