@@ -57,6 +57,8 @@ fn App() -> Element {
         style {
             "@font-face {{ font-family: 'IBM Plex Mono'; font-style: italic; src: url({IBM_PLEX_MONO}); }}"
         }
+
+        // Routers
         FixedSizeContainer {
             if true {
                 Router::<AuthRoute> {}
