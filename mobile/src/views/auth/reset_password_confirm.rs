@@ -1,8 +1,7 @@
 use dioxus::prelude::*;
 
-use crate::views::auth::{components::AuthContainer, Route};
-
-use super::components::Header;
+use super::components::{AuthContainer, Header};
+use crate::views::Route;
 use ui::{
     forms::{
         button::{SolidButton, TransparentButton, UnstyledButton},

@@ -1,11 +1,11 @@
 use dioxus::prelude::*;
 
 use crate::{
+    api::ApiClient,
+    hooks::use_token,
     platform::use_persistent,
-    views::auth::{
-        components::{AuthContainer, Error},
-        Route,
-    },
+    views::auth::components::{AuthContainer, Error},
+    views::Route,
 };
 
 use super::components::Header;
@@ -20,9 +20,30 @@ use ui::{
 
 #[component]
 pub fn Login() -> Element {
+    let mut token = use_token();
     let mut email_or_username = use_signal(String::new);
     let mut password = use_signal(String::new);
     let mut error = use_signal(|| None::<String>);
+
+    let login = use_callback(move |_| {
+        if email_or_username().is_empty() || password().is_empty() {
+            error.set(Some("Email and password cannot be empty".to_string()));
+            return;
+        }
+
+        spawn(async move {
+            let client = ApiClient::new("https://api.bind.sh".to_string());
+            match client.login_user(&email_or_username(), &password()).await {
+                Ok(response) => {
+                    token.set(Some(response.token));
+                    navigator().push(Route::Feed {});
+                }
+                Err(err) => {
+                    error.set(Some(err.to_string()));
+                }
+            }
+        });
+    });
 
     rsx! {
         AuthContainer {
@@ -72,7 +93,7 @@ pub fn Login() -> Element {
                 // Actions
                 Column { gap: "12px", align: "stretch",
 
-                    SolidButton { onclick: move |_| {}, "Login" }
+                    SolidButton { onclick: move |_| { login.call(()); }, "Login" }
                     TransparentButton {
                         onclick: move |_| {
                             navigator().push(Route::ResetPassword {});

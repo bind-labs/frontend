@@ -1,5 +1,6 @@
 use dioxus::{mobile::window, prelude::*};
 
+// TODO: clean up event listener
 pub fn use_keyboard_open() -> Signal<bool> {
     let mut keyboard_open = use_signal(|| false);
 

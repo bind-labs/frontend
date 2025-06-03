@@ -1,36 +1,33 @@
-use dioxus::{mobile::window, prelude::*};
+use dioxus::prelude::*;
 mod components;
 mod feed_reader;
 mod parsed_reader;
 
 use crate::{
     components::navbar::{Navbar, NavbarButton, NavbarButtonWithoutRoute},
+    hooks::use_token,
     platform::share_feed_item,
+    views::Route,
 };
 use ui::icons::{
     ArrowTopRightOnSquareIcon, Bars3Icon, BookmarkIcon, NewspaperIcon, PlusIcon, QueueIcon,
     SearchIcon, ShareIcon, TextSettingsIcon,
 };
 
-use feed_reader::FeedReader;
-use parsed_reader::ParsedReader;
+pub use feed_reader::FeedReader;
+pub use parsed_reader::ParsedReader;
 
-#[derive(Debug, Clone, Copy, Routable, PartialEq)]
-#[rustfmt::skip]
-pub enum Route {
-    #[layout(ReaderLayout)]
-        // default to /default
-        #[redirect("/:..segments", |segments: Vec<String>| Route::FeedReader {})]
-        #[route("/")]
-        FeedReader {},
-        #[route("/parsed")]
-        ParsedReader {},
-
-}
-
-#[allow(non_snake_case)]
+#[component]
 pub fn ReaderLayout() -> Element {
+    // TODO: better way to redirect to sign up if not logged in?
     let nav = use_navigator();
+    let token = use_token();
+
+    use_effect(move || {
+        if token.get().is_none() {
+            nav.push(Route::SignUp {});
+        }
+    });
 
     rsx! {
         div {

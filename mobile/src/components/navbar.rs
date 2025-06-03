@@ -1,14 +1,15 @@
 use dioxus::prelude::*;
 use ui::forms::button::UnstyledButton;
 
-use crate::views::dashboard::Route;
+use crate::views::Route;
 
 #[component]
-pub fn NavbarButton<Route: Routable + PartialEq + Copy>(
+pub fn NavbarButton<Route: Routable + PartialEq + Clone>(
     icon: fn(active: bool) -> Element,
     to: Route,
 ) -> Element {
     let current_route = use_route::<Route>();
+    let to_clone = to.clone();
 
     rsx! {
         UnstyledButton {
@@ -19,9 +20,7 @@ pub fn NavbarButton<Route: Routable + PartialEq + Copy>(
             flex_grow: "1",
             padding: "0px 12px",
 
-            onclick: move |_| {
-                navigator().push(to);
-            },
+            onclick: move |_| { navigator().push(to_clone.clone()); },
 
             {icon(current_route == to)}
         }

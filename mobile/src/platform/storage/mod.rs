@@ -6,15 +6,15 @@ use serde::{de::DeserializeOwned, Serialize};
 
 #[cfg(target_os = "android")]
 mod android;
+#[cfg(target_os = "ios")]
 mod ios;
 mod store;
 
 use store::SecureStore;
 
+// TODO: use Signal::new() instead of a custom struct?
 pub fn use_persistent<T: Serialize + DeserializeOwned + Default + 'static>(
-    // A unique key for the storage entry
     key: impl ToString,
-    // A function that returns the initial value if the storage entry is empty
     init: impl FnOnce() -> T,
 ) -> UsePersistent<T> {
     // Use the use_signal hook to create a mutable state for the storage entry

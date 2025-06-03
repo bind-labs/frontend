@@ -180,13 +180,20 @@ impl ApiClient {
     ///
     /// Corresponds to `POST /user/email/login`.
     /// This endpoint does not require prior authentication.
-    ///
-    /// # Arguments
-    /// * `login_data` - The user's login credentials.
-    pub async fn login_user(&self, login_data: &UserLoginRequest) -> Result<UserLoginResponse> {
+    pub async fn login_user(
+        &self,
+        email_or_username: &str,
+        password: &str,
+    ) -> Result<UserLoginResponse> {
+        let is_email = email_or_username.contains('@');
+
         let response = self
             .make_request(reqwest::Method::POST, "/user/email/login")
-            .json(login_data)
+            .json(&UserLoginRequest {
+                email: is_email.then_some(email_or_username.to_string()),
+                username: (!is_email).then_some(email_or_username.to_string()),
+                password: password.to_string(),
+            })
             .send()
             .await?;
 

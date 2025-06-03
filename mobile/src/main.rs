@@ -13,9 +13,7 @@ mod views;
 
 use components::container::FixedSizeContainer;
 use platform::use_platform_setup;
-use views::auth::Route as AuthRoute;
-use views::dashboard::Route as DashboardRoute;
-use views::reader::Route as ReaderRoute;
+use views::Route;
 
 const THEME_CSS: Asset = asset!("/assets/theme.css");
 const MAIN_CSS: Asset = asset!("/assets/main.css");
@@ -57,7 +55,7 @@ fn App() -> Element {
 
         // Routers
         FixedSizeContainer {
-            Router::<AuthRoute> {}
+            Router::<Route> {}
         }
     }
 }

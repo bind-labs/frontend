@@ -3,8 +3,8 @@ use dioxus::prelude::*;
 use crate::views::auth::{
     components::{AuthContainer, Error},
     validation::validate_email,
-    Route,
 };
+use crate::views::Route;
 
 use super::components::Header;
 use ui::{

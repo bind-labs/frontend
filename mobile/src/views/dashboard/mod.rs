@@ -1,6 +1,10 @@
 use dioxus::prelude::*;
 
-use crate::components::navbar::{Navbar, NavbarButton};
+use crate::{
+    components::navbar::{Navbar, NavbarButton},
+    hooks::use_token,
+    views::Route,
+};
 use ui::icons::{Bars3Icon, BookmarkIcon, PlusIcon, QueueIcon, SearchIcon};
 
 mod components;
@@ -9,27 +13,21 @@ mod list;
 mod search;
 
 use components::Header;
-use feed::Feed;
-use list::List;
-use search::Search;
+pub use feed::Feed;
+pub use list::List;
+pub use search::Search;
 
-#[derive(Debug, Clone, Copy, Routable, PartialEq)]
-#[rustfmt::skip]
-pub enum Route {
-    #[layout(DashboardLayout)]
-        // default to /feed
-        #[redirect("/:..segments", |segments: Vec<String>| Route::Feed {})]
-        #[route("/feed")]
-        Feed {},
-        #[route("/list")]
-        List {},
-        #[route("/search")]
-        Search {},
-}
-
-#[allow(non_snake_case)]
-fn DashboardLayout() -> Element {
+#[component]
+pub fn DashboardLayout() -> Element {
+    // TODO: better way to redirect to sign up if not logged in?
     let nav = use_navigator();
+    let token = use_token();
+
+    use_effect(move || {
+        if token.get().is_none() {
+            nav.push(Route::SignUp {});
+        }
+    });
 
     rsx! {
         div {

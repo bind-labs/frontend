@@ -5,7 +5,7 @@ use super::components::Header;
 use crate::hooks::use_keyboard_open;
 use crate::views::auth::components::{AuthContainer, Error};
 use crate::views::auth::validation::{validate_email, validate_password, validate_username};
-use crate::{api::ApiClient, views::auth::Route};
+use crate::{api::ApiClient, views::Route};
 
 use ui::{
     forms::{

@@ -2,11 +2,10 @@ use dioxus::prelude::*;
 
 use crate::{
     api::{types::auth::UserRegisterRequest, ApiClient},
+    hooks::use_token,
     platform::{self, use_persistent},
-    views::auth::{
-        components::{AuthContainer, Error, Header},
-        Route,
-    },
+    views::auth::components::{AuthContainer, Error, Header},
+    views::Route,
 };
 use ui::{
     forms::{
@@ -19,7 +18,7 @@ use ui::{
 
 #[component]
 pub fn VerifyEmail(email: String, username: String, password: String) -> Element {
-    let mut token = use_persistent::<Option<String>>("token", || None);
+    let mut token = use_token();
     let mut code = use_signal(String::new);
     let mut error = use_signal(|| None::<String>);
 
@@ -47,7 +46,7 @@ pub fn VerifyEmail(email: String, username: String, password: String) -> Element
             {
                 Ok(response) => {
                     token.set(Some(response.token));
-                    navigator().push(Route::Login {});
+                    navigator().push(Route::Feed {});
                 }
                 Err(err) => {
                     error.set(Some(err.to_string()));

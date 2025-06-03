@@ -54,24 +54,4 @@ impl SecureStore {
             deserialized
         })
     }
-
-    // Delete a secret value
-    pub fn delete(key: &str) -> () {
-        // Store empty string to effectively delete
-        secure_store(key, "");
-
-        // Remove from cache
-        SECRET_CACHE.lock().unwrap().remove(key);
-    }
-
-    // Check if a key exists
-    pub fn exists(key: &str) -> bool {
-        // Check cache first
-        if SECRET_CACHE.lock().unwrap().contains_key(key) {
-            return true;
-        }
-
-        // Check secure storage
-        secure_retrieve(key).map(|v| v.is_some()).unwrap_or(false)
-    }
 }
