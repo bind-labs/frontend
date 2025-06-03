@@ -20,7 +20,7 @@ pub enum Route {
     #[redirect("/:..segments", |segments: Vec<String>| Route::SignUp {})]
     #[route("/sign-up")]
     SignUp {},
-    #[route("/verify-email")]
+    #[route("/verify-email?:email&:username&:password")]
     VerifyEmail {
         email: String,
         username: String,

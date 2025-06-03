@@ -1,9 +1,10 @@
 use dioxus::prelude::*;
 
 use crate::{
-    platform,
+    api::{types::auth::UserRegisterRequest, ApiClient},
+    platform::{self, use_persistent},
     views::auth::{
-        components::{AuthContainer, Header},
+        components::{AuthContainer, Error, Header},
         Route,
     },
 };
@@ -18,7 +19,42 @@ use ui::{
 
 #[component]
 pub fn VerifyEmail(email: String, username: String, password: String) -> Element {
+    let mut token = use_persistent::<Option<String>>("token", || None);
     let mut code = use_signal(String::new);
+    let mut error = use_signal(|| None::<String>);
+
+    let register = use_callback(move |_| {
+        if code().len() != 5 {
+            error.set(Some("Code must be 5 digits long".to_string()));
+            return;
+        }
+        error.set(None);
+
+        let email = email.clone();
+        let username = username.clone();
+        let password = password.clone();
+
+        spawn(async move {
+            let client = ApiClient::new("https://api.bind.sh".to_string());
+            match client
+                .register_user(&UserRegisterRequest {
+                    email,
+                    email_code: code(),
+                    username,
+                    password,
+                })
+                .await
+            {
+                Ok(response) => {
+                    token.set(Some(response.token));
+                    navigator().push(Route::Login {});
+                }
+                Err(err) => {
+                    error.set(Some(err.to_string()));
+                }
+            }
+        });
+    });
 
     rsx! {
         AuthContainer {
@@ -38,8 +74,13 @@ pub fn VerifyEmail(email: String, username: String, password: String) -> Element
             }
 
             Column { gap: "8px",
-                SolidButton { onclick: move |_| { platform::open_email(); },
-                    "Open Email App"
+                Column { gap: "16px",
+                    SolidButton { onclick: move |_| { register.call(()); },
+                        "Submit"
+                    }
+                    SolidButton { onclick: move |_| { platform::open_email(); },
+                        "Open Email App"
+                    }
                 }
                 TransparentButton { onclick: move |_| {},
                     "Didn't receive the code? Resend"
@@ -47,6 +88,7 @@ pub fn VerifyEmail(email: String, username: String, password: String) -> Element
                 TransparentButton { onclick: move |_| { navigator().push(Route::SignUp {}); },
                     "Go Back"
                 }
+                Error { error }
             }
         }
     }

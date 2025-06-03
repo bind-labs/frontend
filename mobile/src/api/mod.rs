@@ -150,17 +150,13 @@ impl ApiClient {
     ///
     /// Corresponds to `POST /user/email/verify`.
     /// This endpoint does not require prior authentication.
-    ///
-    /// # Arguments
-    /// * `verification_request_data` - The email to send the verification code to.
-    pub async fn send_email_verification(
-        &self,
-        verification_request_data: &EmailVerificationRequest,
-    ) -> Result<()> {
+    pub async fn send_email_verification(&self, email: &str) -> Result<()> {
         // Returns Ok(()) on success
         let response = self
             .make_request(reqwest::Method::POST, "/user/email/verify")
-            .json(verification_request_data)
+            .json(&EmailVerificationRequest {
+                email: email.to_string(),
+            })
             .send()
             .await?;
 

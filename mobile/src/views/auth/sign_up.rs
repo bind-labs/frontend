@@ -19,31 +19,39 @@ use ui::{
 
 #[component]
 pub fn SignUp() -> Element {
-    let client = ApiClient::new(String::from("https://api.bind.sh"));
-
-    let mut error = use_signal(|| None::<String>);
-
+    let navigator = use_navigator();
     let mut email = use_signal(String::new);
     let mut username = use_signal(String::new);
     let mut password = use_signal(String::new);
+    let mut error = use_signal(|| None::<String>);
 
     let keyboard_open = use_keyboard_open();
 
     let sign_up = use_callback(move |_| {
-        // if let Err(err) = validate_email(&email()) {
-        //     error.set(Some(err));
-        // } else if let Err(err) = validate_username(&username()) {
-        //     error.set(Some(err));
-        // } else if let Err(err) = validate_password(&password()) {
-        //     error.set(Some(err));
-        // } else {
-        error.set(None);
-        navigator().push(Route::VerifyEmail {
-            email: email(),
-            username: username(),
-            password: password(),
-        });
-        // }
+        if let Err(err) = validate_email(&email()) {
+            error.set(Some(err));
+        } else if let Err(err) = validate_username(&username()) {
+            error.set(Some(err));
+        } else if let Err(err) = validate_password(&password()) {
+            error.set(Some(err));
+        } else {
+            error.set(None);
+            spawn(async move {
+                let client = ApiClient::new(String::from("https://api.bind.sh"));
+                match client.send_email_verification(&email()).await {
+                    Ok(_) => {
+                        navigator.push(Route::VerifyEmail {
+                            email: email(),
+                            username: username(),
+                            password: password(),
+                        });
+                    }
+                    Err(err) => {
+                        error.set(Some(err.to_string()));
+                    }
+                }
+            });
+        }
     });
 
     rsx! {
@@ -110,7 +118,7 @@ pub fn SignUp() -> Element {
                     }
                     TransparentButton {
                         onclick: move |_| {
-                            navigator().push(Route::Login {});
+                            navigator.push(Route::Login {});
                         },
                         "Login"
                     }

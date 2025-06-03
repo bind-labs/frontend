@@ -1,8 +1,11 @@
 use dioxus::prelude::*;
 
-use crate::views::auth::{
-    components::{AuthContainer, Error},
-    Route,
+use crate::{
+    platform::use_persistent,
+    views::auth::{
+        components::{AuthContainer, Error},
+        Route,
+    },
 };
 
 use super::components::Header;
