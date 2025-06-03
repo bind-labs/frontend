@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::views::auth::Route;
+use crate::views::auth::{components::AuthContainer, Route};
 
 use super::components::Header;
 use ui::{
@@ -20,12 +20,7 @@ pub fn ResetPassword() -> Element {
     let mut password = use_signal(String::new);
     let mut code = use_signal(String::new);
     rsx! {
-        Column {
-            height: "100%",
-            width: "100%",
-            margin: "auto",
-            gap: "16px",
-            align: "center",
+        AuthContainer {
             Header {
                 title: "Password",
                 subtitle: "Reset your",
@@ -44,6 +39,7 @@ pub fn ResetPassword() -> Element {
                     icon: rsx! {
                         EnvelopeIcon {}
                     },
+                    input_type: "email",
                     onchange: move |value| email.set(value),
                 }
 
@@ -54,6 +50,7 @@ pub fn ResetPassword() -> Element {
                         icon: rsx! {
                             LockIcon {}
                         },
+                        input_type: "password",
                         onchange: move |value| password.set(value),
                     }
                 }
@@ -64,16 +61,18 @@ pub fn ResetPassword() -> Element {
             }
 
 
-            SolidButton { onclick: move |_| { if email_sent() {} else { email_sent.set(true) } },
-                "Reset Password"
-            }
+            Column { gap: "8px",
+                SolidButton { onclick: move |_| { if email_sent() {} else { email_sent.set(true) } },
+                    "Reset Password"
+                }
 
-            TransparentButton {
+                TransparentButton {
 
-                onclick: move |_| {
-                    navigator().push(Route::Login {});
-                },
-                "Login"
+                    onclick: move |_| {
+                        navigator().push(Route::Login {});
+                    },
+                    "Login"
+                }
             }
         }
     }

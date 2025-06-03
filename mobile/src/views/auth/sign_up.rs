@@ -1,8 +1,12 @@
-use dioxus::prelude::*;
-
-use crate::views::auth::Route;
+use dioxus::{mobile::window, prelude::*};
+use regex::Regex;
 
 use super::components::Header;
+use crate::hooks::use_keyboard_open;
+use crate::views::auth::components::AuthContainer;
+use crate::views::auth::validation::{validate_email, validate_password, validate_username};
+use crate::{api::ApiClient, views::auth::Route};
+
 use ui::{
     forms::{
         button::{SolidButton, TransparentButton, UnstyledButton},
@@ -15,59 +19,39 @@ use ui::{
 
 #[component]
 pub fn SignUp() -> Element {
-    let mut email_sent = use_signal(|| false);
+    let client = ApiClient::new(String::from("https://api.bind.sh"));
+
+    let mut error = use_signal(|| None::<String>);
+
     let mut email = use_signal(String::new);
     let mut username = use_signal(String::new);
     let mut password = use_signal(String::new);
-    let mut code = use_signal(String::new);
+
+    let keyboard_open = use_keyboard_open();
+
+    let sign_up = use_callback(move |_| {
+        if let Err(err) = validate_email(&email()) {
+            error.set(Some(err));
+        } else if let Err(err) = validate_username(&username()) {
+            error.set(Some(err));
+        } else if let Err(err) = validate_password(&password()) {
+            error.set(Some(err));
+        } else {
+            error.set(None);
+            navigator().push(Route::VerifyEmail {
+                email: email(),
+                username: username(),
+                password: password(),
+            });
+        }
+    });
 
     rsx! {
-        if email_sent() {
-            Column {
-                height: "100%",
-                width: "100%",
-                margin: "auto",
-                gap: "16px",
-                align: "center",
+        AuthContainer {
+            Header { subtitle: "Welcome to", title: "Bind" }
 
-                Header {
-                    subtitle: "Verify your",
-                    title: "Email",
-                    icon: rsx! {
-                        EnvelopeIcon { size: 82 }
-                    },
-                }
-
-                CodeInput {
-                    length: 5,
-                    onchange: move |value| {
-                        code.set(value);
-                    },
-                }
-
-                SolidButton { onclick: move |_| {}, "Open Email App" }
-                TransparentButton {
-                    onclick: move |_| {},
-                    "Didn't receive the code? Resend"
-                }
-            }
-        } else {
-            Column {
-                align: "stretch",
-                cross_align: "space-evenly",
-
-                height: "100%",
-                width: "100%",
-                max_width: "300px",
-                margin: "auto",
-                padding: "36px 16px",
-
-
-                Header { subtitle: "Welcome to", title: "Bind" }
-
-
-
-                // OAuth
+            // OAuth
+            if !keyboard_open() {
                 Column { gap: "24px",
 
                     button { class: "solid", onclick: move |_| {},
@@ -81,56 +65,60 @@ pub fn SignUp() -> Element {
                 }
 
                 hr { width: "100px" }
+            }
 
-                // Form
-                Column { gap: "24px",
+            // Form
+            Column { gap: "16px",
 
-                    Input {
-                        title: "Email",
-                        placeholder: "Email",
-                        icon: rsx! {
-                            EnvelopeIcon {}
-                        },
-                        onchange: move |value| {
-                            email.set(value);
-                        },
+                Input {
+                    title: "Email",
+                    placeholder: "Email",
+                    icon: rsx! {
+                        EnvelopeIcon {}
+                    },
+                    input_type: "email",
+                    onchange: move |value| { email.set(value) },
+                }
+                Input {
+                    title: "Username",
+                    placeholder: "Username",
+                    icon: rsx! {
+                        UserIcon {}
+                    },
+                    onchange: move |value| {
+                        username.set(value);
+                    },
+                }
+                Input {
+                    title: "Password",
+                    placeholder: "Password",
+                    icon: rsx! {
+                        LockIcon {}
+                    },
+                    input_type: "password",
+                    onchange: move |value| {
+                        password.set(value);
+                    },
+                }
+
+                // Actions
+                Column { gap: "8px", align: "stretch",
+
+                    SolidButton {
+                        onclick: move |_| { sign_up.call(()) },
+                        "Sign up"
                     }
-                    Input {
-                        title: "Username",
-                        placeholder: "Username",
-                        icon: rsx! {
-                            UserIcon {}
+                    TransparentButton {
+                        onclick: move |_| {
+                            navigator().push(Route::Login {});
                         },
-                        onchange: move |value| {
-                            username.set(value);
-                        },
-                    }
-                    Input {
-                        title: "Password",
-                        placeholder: "Password",
-                        icon: rsx! {
-                            LockIcon {}
-                        },
-                        password: true,
-                        onchange: move |value| {
-                            password.set(value);
-                        },
+                        "Login"
                     }
 
-                    // Actions
-                    Column { gap: "12px", align: "stretch",
-
-                        SolidButton {
-                            onclick: move |_| {
-                                email_sent.set(true);
-                            },
-                            "Sign up"
-                        }
-                        TransparentButton {
-                            onclick: move |_| {
-                                navigator().push(Route::Login {});
-                            },
-                            "Login"
+                    // Error
+                    if let Some(error) = error() {
+                        span { align_self: "center", color: "var(--text-error)", text_align: "center",
+                            "{error}"
                         }
                     }
                 }

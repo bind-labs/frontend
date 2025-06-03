@@ -42,11 +42,11 @@ impl ApiClient {
     pub fn new(base_url: String) -> Self {
         let mut headers = HeaderMap::new();
         headers.insert("Content-Type", HeaderValue::from_static("application/json"));
-        // make this dynamic
+        // TODO: make this dynamic
         headers.insert("User-Agent", HeaderValue::from_static("bind-app/1.0"));
         let client_builder = reqwest::ClientBuilder::new()
             .default_headers(headers)
-            .timeout(Duration::from_secs(60));
+            .timeout(Duration::from_secs(30));
         Self {
             client: client_builder.build().unwrap(),
             base_url,

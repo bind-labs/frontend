@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::views::auth::Route;
+use crate::views::auth::{components::AuthContainer, Route};
 
 use super::components::Header;
 use ui::{
@@ -18,16 +18,7 @@ pub fn Login() -> Element {
     let mut password = use_signal(String::new);
 
     rsx! {
-        Column {
-            align: "stretch",
-            cross_align: "space-evenly",
-
-            height: "100%",
-            width: "100%",
-            max_width: "300px",
-            margin: "auto",
-            padding: "36px 16px",
-
+        AuthContainer {
             Header { subtitle: "Welcome back to", title: "Bind" }
 
             // OAuth
@@ -54,6 +45,7 @@ pub fn Login() -> Element {
                     icon: rsx! {
                         UserIcon {}
                     },
+                    input_type: "email",
                     onchange: move |value| {
                         email_or_username.set(value);
                     },
@@ -64,7 +56,7 @@ pub fn Login() -> Element {
                     icon: rsx! {
                         LockIcon {}
                     },
-                    password: true,
+                    input_type: "password",
                     onchange: move |value| {
                         password.set(value);
                     },

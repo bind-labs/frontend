@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use dioxus::prelude::*;
 
 #[derive(Clone, Debug, Copy, PartialEq)]
@@ -11,15 +13,16 @@ pub struct Props {
     #[props(extends = GlobalAttributes, extends = input)]
     attributes: Vec<Attribute>,
     title: Option<String>,
+    input_type: Option<String>,
     icon: Option<Element>,
     icon_position: Option<IconPosition>,
-    #[props(default = false)]
-    password: bool,
     onchange: Callback<String>,
 }
 
 #[allow(non_snake_case)]
 pub fn Input(props: Props) -> Element {
+    let mut element_ref = use_signal(|| None::<Rc<MountedData>>);
+
     let title = props.title.map(|title| -> Element {
         rsx! {
             label {
@@ -86,7 +89,10 @@ pub fn Input(props: Props) -> Element {
                 color: "#000000",
                 border: "1px solid var(--text)",
                 outline: "none",
+
+                type: props.input_type,
                 onchange: move |ev| props.onchange.call(ev.value().clone()),
+
                 ..props.attributes,
             }
         }

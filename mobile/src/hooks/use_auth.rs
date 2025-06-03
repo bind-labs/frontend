@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    storage::{use_persistent, UsePersistent},
+    platform::{use_persistent, UsePersistent},
     AuthContext,
 };
 

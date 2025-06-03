@@ -1,14 +1,5 @@
-use std::sync::atomic::AtomicBool;
-
-static HAS_SETUP: AtomicBool = AtomicBool::new(false);
-
-#[cfg(target_os = "android")]
-pub fn setup_platform() {
+pub fn setup_decor() {
     use dioxus::mobile::wry::prelude::dispatch;
-
-    if HAS_SETUP.load(std::sync::atomic::Ordering::SeqCst) {
-        return;
-    }
 
     // TODO: remove unwraps
     dispatch(|env, activity, _webview| {
@@ -56,15 +47,4 @@ pub fn setup_platform() {
         env.call_method(&window, "setNavigationBarColor", "(I)V", &[color.into()])
             .unwrap();
     });
-
-    if !HAS_SETUP.load(std::sync::atomic::Ordering::SeqCst) {
-        HAS_SETUP.store(true, std::sync::atomic::Ordering::SeqCst);
-    }
-}
-
-#[cfg(target_os = "ios")]
-pub fn setup_platform() {
-    if !HAS_SETUP.load(std::sync::atomic::Ordering::SeqCst) {
-        HAS_SETUP.store(true, std::sync::atomic::Ordering::SeqCst);
-    }
 }

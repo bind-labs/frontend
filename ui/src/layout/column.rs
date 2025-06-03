@@ -57,6 +57,9 @@ pub struct Props {
     pub border_right: Option<String>,
 
     #[props(into)]
+    pub onresize: Option<Callback<()>>,
+
+    #[props(into)]
     pub shadow: Option<String>,
 }
 
@@ -118,6 +121,12 @@ pub fn Column(props: Props) -> Element {
             border_right: props.border_right,
 
             box_shadow: props.shadow,
+
+            onresize: move |_| {
+                if let Some(cb) = props.onresize.as_ref() {
+                    cb.call(());
+                }
+            },
 
             {props.children}
         }

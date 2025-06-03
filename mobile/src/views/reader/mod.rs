@@ -5,7 +5,7 @@ mod parsed_reader;
 
 use crate::{
     components::navbar::{Navbar, NavbarButton, NavbarButtonWithoutRoute},
-    share::share_feed_item,
+    platform::share_feed_item,
 };
 use ui::icons::{
     ArrowTopRightOnSquareIcon, Bars3Icon, BookmarkIcon, NewspaperIcon, PlusIcon, QueueIcon,

@@ -4,9 +4,13 @@ mod components;
 mod login;
 mod reset_password;
 mod sign_up;
+mod validation;
+mod verify_email;
+
 use login::Login;
 use reset_password::ResetPassword;
 use sign_up::SignUp;
+use verify_email::VerifyEmail;
 
 #[derive(Debug, Clone, Routable, PartialEq)]
 pub enum Route {
@@ -14,6 +18,12 @@ pub enum Route {
     #[redirect("/:..segments", |segments: Vec<String>| Route::SignUp {})]
     #[route("/sign-up")]
     SignUp {},
+    #[route("/verify-email")]
+    VerifyEmail {
+        email: String,
+        username: String,
+        password: String,
+    },
     #[route("/login")]
     Login {},
     #[route("/reset-password")]

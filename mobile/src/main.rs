@@ -2,18 +2,17 @@ use api::types::auth::AuthUser;
 use api::ApiClient;
 use dioxus::dioxus_core::LaunchConfig;
 use dioxus::mobile::wry::WebView;
-use dioxus::mobile::{use_window, Config, WindowBuilder};
+use dioxus::mobile::{use_window, window, Config, WindowBuilder};
 use dioxus::prelude::*;
 
 mod api;
 mod components;
 mod hooks;
 mod platform;
-mod share;
-mod storage;
 mod views;
 
 use components::container::FixedSizeContainer;
+use platform::use_platform_setup;
 use views::auth::Route as AuthRoute;
 use views::dashboard::Route as DashboardRoute;
 use views::reader::Route as ReaderRoute;
@@ -42,9 +41,7 @@ struct AppContext {
 
 #[component]
 fn App() -> Element {
-    use_effect(|| {
-        platform::setup_platform();
-    });
+    use_platform_setup();
 
     rsx! {
         // Global app resources
