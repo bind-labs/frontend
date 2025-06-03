@@ -1,10 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::views::auth::{
-    components::{AuthContainer, Error},
-    validation::validate_email,
-    Route,
-};
+use crate::views::auth::{components::AuthContainer, Route};
 
 use super::components::Header;
 use ui::{
@@ -18,18 +14,9 @@ use ui::{
 };
 
 #[component]
-pub fn ResetPassword() -> Element {
-    let mut email = use_signal(String::new);
-    let mut error = use_signal(|| None::<String>);
-
-    let reset_password = use_callback(move |_| {
-        if let Err(err) = validate_email(&email()) {
-            error.set(Some(err));
-        } else {
-            error.set(None);
-            navigator().push(Route::ResetPasswordConfirm { email: email() });
-        }
-    });
+pub fn ResetPasswordConfirm(email: String) -> Element {
+    let mut password = use_signal(String::new);
+    let mut code = use_signal(String::new);
 
     rsx! {
         AuthContainer {
@@ -41,25 +28,33 @@ pub fn ResetPassword() -> Element {
                 },
             }
 
+            CodeInput { length: 5, onchange: move |value| code.set(value) }
+
             Input {
-                title: "Email",
-                placeholder: "Email",
+                title: "Password",
+                placeholder: "Password",
                 icon: rsx! {
-                    EnvelopeIcon {}
+                    LockIcon {}
                 },
-                input_type: "email",
-                onchange: move |value| email.set(value),
+                input_type: "password",
+                onchange: move |value| password.set(value),
             }
 
             Column { gap: "8px",
                 SolidButton {
-                    onclick: reset_password,
+                    onclick: move |_| {
+                        // TODO:
+                    },
                     "Reset Password"
                 }
+
+                TransparentButton { onclick: move |_| { navigator().push(Route::ResetPassword {}); },
+                    "Go Back"
+                }
+
                 TransparentButton { onclick: move |_| { navigator().push(Route::Login {}); },
                     "Login"
                 }
-                Error { error }
             }
         }
     }

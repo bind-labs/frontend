@@ -1,6 +1,9 @@
 use dioxus::prelude::*;
 
-use crate::views::auth::{components::AuthContainer, Route};
+use crate::views::auth::{
+    components::{AuthContainer, Error},
+    Route,
+};
 
 use super::components::Header;
 use ui::{
@@ -16,6 +19,7 @@ use ui::{
 pub fn Login() -> Element {
     let mut email_or_username = use_signal(String::new);
     let mut password = use_signal(String::new);
+    let mut error = use_signal(|| None::<String>);
 
     rsx! {
         AuthContainer {
@@ -78,6 +82,7 @@ pub fn Login() -> Element {
                         },
                         "Sign up"
                     }
+                    Error { error }
                 }
             }
         }

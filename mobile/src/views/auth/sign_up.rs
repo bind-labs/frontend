@@ -3,7 +3,7 @@ use regex::Regex;
 
 use super::components::Header;
 use crate::hooks::use_keyboard_open;
-use crate::views::auth::components::AuthContainer;
+use crate::views::auth::components::{AuthContainer, Error};
 use crate::views::auth::validation::{validate_email, validate_password, validate_username};
 use crate::{api::ApiClient, views::auth::Route};
 
@@ -30,20 +30,20 @@ pub fn SignUp() -> Element {
     let keyboard_open = use_keyboard_open();
 
     let sign_up = use_callback(move |_| {
-        if let Err(err) = validate_email(&email()) {
-            error.set(Some(err));
-        } else if let Err(err) = validate_username(&username()) {
-            error.set(Some(err));
-        } else if let Err(err) = validate_password(&password()) {
-            error.set(Some(err));
-        } else {
-            error.set(None);
-            navigator().push(Route::VerifyEmail {
-                email: email(),
-                username: username(),
-                password: password(),
-            });
-        }
+        // if let Err(err) = validate_email(&email()) {
+        //     error.set(Some(err));
+        // } else if let Err(err) = validate_username(&username()) {
+        //     error.set(Some(err));
+        // } else if let Err(err) = validate_password(&password()) {
+        //     error.set(Some(err));
+        // } else {
+        error.set(None);
+        navigator().push(Route::VerifyEmail {
+            email: email(),
+            username: username(),
+            password: password(),
+        });
+        // }
     });
 
     rsx! {
@@ -114,13 +114,7 @@ pub fn SignUp() -> Element {
                         },
                         "Login"
                     }
-
-                    // Error
-                    if let Some(error) = error() {
-                        span { align_self: "center", color: "var(--text-error)", text_align: "center",
-                            "{error}"
-                        }
-                    }
+                    Error { error }
                 }
             }
         }

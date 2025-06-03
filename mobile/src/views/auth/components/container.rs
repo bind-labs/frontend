@@ -5,8 +5,7 @@ use ui::layout::Column;
 pub fn AuthContainer(gap: Option<String>, align: Option<String>, children: Element) -> Element {
     rsx! {
         Column {
-            align: align.unwrap_or("stretch".to_string()),
-            // cross_align: "space-evenly",
+            align: "stretch",
 
             height: "100%",
             width: "100%",

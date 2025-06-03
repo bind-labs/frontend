@@ -43,6 +43,9 @@ pub struct Props {
     pub cross_align: Option<String>,
 
     #[props(into)]
+    pub align_self: Option<String>,
+
+    #[props(into)]
     pub gap: Option<String>,
     #[props(into)]
     pub padding: Option<String>,
@@ -114,6 +117,7 @@ pub fn Row(props: Props) -> Element {
 
             justify_content: props.align,
             align_items: props.cross_align,
+            align_self: props.align_self,
 
             gap: props.gap,
             padding: props.padding,

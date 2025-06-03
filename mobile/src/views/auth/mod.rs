@@ -3,12 +3,14 @@ use dioxus::prelude::*;
 mod components;
 mod login;
 mod reset_password;
+mod reset_password_confirm;
 mod sign_up;
 mod validation;
 mod verify_email;
 
 use login::Login;
 use reset_password::ResetPassword;
+use reset_password_confirm::ResetPasswordConfirm;
 use sign_up::SignUp;
 use verify_email::VerifyEmail;
 
@@ -28,4 +30,6 @@ pub enum Route {
     Login {},
     #[route("/reset-password")]
     ResetPassword {},
+    #[route("/reset-password-confirm")]
+    ResetPasswordConfirm { email: String },
 }

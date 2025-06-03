@@ -57,11 +57,7 @@ fn App() -> Element {
 
         // Routers
         FixedSizeContainer {
-            if true {
-                Router::<AuthRoute> {}
-            } else {
-                Router::<ReaderRoute> {}
-            }
+            Router::<AuthRoute> {}
         }
     }
 }

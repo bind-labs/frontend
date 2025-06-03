@@ -2,7 +2,10 @@ use dioxus::prelude::*;
 
 use crate::{
     platform,
-    views::auth::components::{AuthContainer, Header},
+    views::auth::{
+        components::{AuthContainer, Header},
+        Route,
+    },
 };
 use ui::{
     forms::{
@@ -19,7 +22,6 @@ pub fn VerifyEmail(email: String, username: String, password: String) -> Element
 
     rsx! {
         AuthContainer {
-            align: "center",
             gap: "48px",
 
             Header {
@@ -39,9 +41,11 @@ pub fn VerifyEmail(email: String, username: String, password: String) -> Element
                 SolidButton { onclick: move |_| { platform::open_email(); },
                     "Open Email App"
                 }
-                TransparentButton {
-                    onclick: move |_| {},
+                TransparentButton { onclick: move |_| {},
                     "Didn't receive the code? Resend"
+                }
+                TransparentButton { onclick: move |_| { navigator().push(Route::SignUp {}); },
+                    "Go Back"
                 }
             }
         }
