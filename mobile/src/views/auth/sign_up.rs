@@ -33,7 +33,7 @@ pub fn SignUp() -> Element {
             error.set(Some(err));
         } else if let Err(err) = validate_username(&username()) {
             error.set(Some(err));
-        } else if let Err(err) = validate_password(&password()) {
+        } else if let Err(err) = validate_password(&email(), &username(), &password()) {
             error.set(Some(err));
         } else {
             error.set(None);

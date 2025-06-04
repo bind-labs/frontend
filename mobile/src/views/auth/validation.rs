@@ -1,5 +1,7 @@
 use std::sync::LazyLock;
 
+use zxcvbn::Score;
+
 static EMAIL_REGEX: LazyLock<regex::Regex> =
     LazyLock::new(|| regex::Regex::new(r"^\S+@\S+\.\S+$").unwrap());
 
@@ -39,24 +41,33 @@ pub fn validate_username(username: &str) -> Result<(), String> {
     Ok(())
 }
 
-pub fn validate_password(password: &str) -> Result<(), String> {
+pub fn validate_password(email: &str, username: &str, password: &str) -> Result<(), String> {
     if password.is_empty() {
         return Err("Password cannot be empty".to_string());
     }
-    if password.len() < 12 {
-        return Err("Password must be at least 12 characters long".to_string());
-    }
-    if password.len() > 128 {
-        return Err("Password must be at most 128 characters long".to_string());
+    if password.len() < 8 || password.len() > 128 {
+        return Err("Password must be between 8 and 128 characters long".to_string());
     }
 
-    // Ensure it contains at least one uppercase and one lowercase letter
-    if !password.chars().any(|c| c.is_ascii_uppercase())
-        || !password.chars().any(|c| c.is_ascii_lowercase())
-    {
-        return Err(
-            "Password must contain at least one uppercase and one lowercase letter".to_string(),
-        );
+    let password_estimate = zxcvbn::zxcvbn(&password, &[&username, &email]);
+    if password_estimate.score() <= Score::Two {
+        if let Some(feedback) = password_estimate.feedback() {
+            return Err(format!(
+                "{}. {}",
+                feedback
+                    .warning()
+                    .map(|x| x.to_string())
+                    .unwrap_or("Password is too weak".to_string()),
+                feedback
+                    .suggestions()
+                    .iter()
+                    .map(|x| x.to_string())
+                    .collect::<Vec<_>>()
+                    .join(". ")
+            ));
+        } else {
+            return Err("Password is too weak, try adding more letters, numbers and symbols. Avoid common words and phrases.".to_string());
+        }
     }
 
     Ok(())
