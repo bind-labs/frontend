@@ -28,9 +28,9 @@ impl ApiClient {
         let base_url = base_url.to_string();
 
         let mut headers = HeaderMap::new();
+        headers.insert("Accept", HeaderValue::from_static("application/json"));
         headers.insert("Content-Type", HeaderValue::from_static("application/json"));
         headers.insert("User-Agent", HeaderValue::from_static(USER_AGENT));
-        headers.insert("Accept", HeaderValue::from_static("application/json"));
 
         let client_builder = reqwest::ClientBuilder::new()
             .default_headers(headers)

@@ -21,7 +21,7 @@ pub use search::Search;
 pub fn DashboardLayout() -> Element {
     // TODO: better way to redirect to sign up if not logged in?
     let nav = use_navigator();
-    let token = use_token();
+    let mut token = use_token();
 
     use_effect(move || {
         if token().is_none() {
@@ -39,7 +39,10 @@ pub fn DashboardLayout() -> Element {
             Header {
                 title: "Read Later",
                 additional: Some("(16 items)".to_string()),
-                onsettings: move || tracing::info!("Settings clicked"),
+                onsettings: move || {
+                    tracing::info!("Settings clicked");
+                    token.set(None);
+                },
             }
 
             main { overflow: "auto", Outlet::<Route> {} }

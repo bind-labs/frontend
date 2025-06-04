@@ -11,15 +11,23 @@ mod use_keyboard_open;
 pub use use_keyboard_open::use_keyboard_open;
 
 static API: LazyLock<ApiClient> = LazyLock::new(|| ApiClient::new("https://api.bind.sh"));
+static TOKEN: GlobalSignal<Option<String>> =
+    Signal::global(|| SecureStore::get("token").unwrap_or(None));
 
 pub fn use_token() -> Signal<Option<String>> {
-    use_persistent::<Option<String>>("token", || None)
+    let token = use_signal(|| TOKEN.read().clone());
+
+    use_effect(move || {
+        SecureStore::set("token", &token());
+        *TOKEN.write() = token();
+    });
+
+    token
 }
 
 pub fn use_api() -> &'static ApiClient {
-    let token = use_token();
     use_effect(move || {
-        API.set_token(token());
+        API.set_token(TOKEN());
     });
 
     &*API
