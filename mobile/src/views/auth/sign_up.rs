@@ -2,7 +2,7 @@ use dioxus::{mobile::window, prelude::*};
 use regex::Regex;
 
 use super::components::Header;
-use crate::hooks::use_keyboard_open;
+use crate::hooks::{use_api, use_keyboard_open};
 use crate::views::auth::components::{AuthContainer, Error};
 use crate::views::auth::validation::{validate_email, validate_password, validate_username};
 use crate::{api::ApiClient, views::Route};
@@ -19,6 +19,7 @@ use ui::{
 
 #[component]
 pub fn SignUp() -> Element {
+    let api = use_api();
     let navigator = use_navigator();
     let mut email = use_signal(String::new);
     let mut username = use_signal(String::new);
@@ -37,8 +38,7 @@ pub fn SignUp() -> Element {
         } else {
             error.set(None);
             spawn(async move {
-                let client = ApiClient::new(String::from("https://api.bind.sh"));
-                match client.send_email_verification(&email()).await {
+                match api.send_email_verification(&email()).await {
                     Ok(_) => {
                         navigator.push(Route::VerifyEmail {
                             email: email(),

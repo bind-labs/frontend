@@ -20,6 +20,7 @@ pub struct SecureStore;
 impl SecureStore {
     // Store a secret value
     pub fn set<T: Serialize>(key: &str, value: T) -> () {
+        // TODO: check if the value is already set to the same value
         let serialized = serde_json::to_string(&value).unwrap();
         secure_store(key, serialized.as_str());
 

@@ -2,10 +2,12 @@ use dioxus::prelude::*;
 
 use crate::{
     api::{types::auth::UserRegisterRequest, ApiClient},
-    hooks::use_token,
-    platform::{self, use_persistent},
-    views::auth::components::{AuthContainer, Error, Header},
-    views::Route,
+    hooks::{use_api, use_token},
+    platform,
+    views::{
+        auth::components::{AuthContainer, Error, Header},
+        Route,
+    },
 };
 use ui::{
     forms::{
@@ -18,6 +20,7 @@ use ui::{
 
 #[component]
 pub fn VerifyEmail(email: String, username: String, password: String) -> Element {
+    let api = use_api();
     let mut token = use_token();
     let mut code = use_signal(String::new);
     let mut error = use_signal(|| None::<String>);
@@ -34,8 +37,7 @@ pub fn VerifyEmail(email: String, username: String, password: String) -> Element
         let password = password.clone();
 
         spawn(async move {
-            let client = ApiClient::new("https://api.bind.sh".to_string());
-            match client
+            match api
                 .register_user(&UserRegisterRequest {
                     email,
                     email_code: code(),

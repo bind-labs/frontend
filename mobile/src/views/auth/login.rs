@@ -2,8 +2,7 @@ use dioxus::prelude::*;
 
 use crate::{
     api::ApiClient,
-    hooks::use_token,
-    platform::use_persistent,
+    hooks::{use_api, use_token},
     views::auth::components::{AuthContainer, Error},
     views::Route,
 };
@@ -20,6 +19,7 @@ use ui::{
 
 #[component]
 pub fn Login() -> Element {
+    let api = use_api();
     let mut token = use_token();
     let mut email_or_username = use_signal(String::new);
     let mut password = use_signal(String::new);
@@ -32,8 +32,7 @@ pub fn Login() -> Element {
         }
 
         spawn(async move {
-            let client = ApiClient::new("https://api.bind.sh".to_string());
-            match client.login_user(&email_or_username(), &password()).await {
+            match api.login_user(&email_or_username(), &password()).await {
                 Ok(response) => {
                     token.set(Some(response.token));
                     navigator().push(Route::Feed {});

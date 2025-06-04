@@ -8,7 +8,7 @@ mod storage;
 
 pub use email::open_email;
 pub use share::share_feed_item;
-pub use storage::{use_persistent, UsePersistent};
+pub use storage::SecureStore;
 
 static HAS_SETUP: AtomicBool = AtomicBool::new(false);
 

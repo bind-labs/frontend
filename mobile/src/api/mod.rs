@@ -2,7 +2,10 @@ use reqwest::{
     header::{HeaderMap, HeaderValue},
     Method,
 };
-use std::time::Duration;
+use std::{
+    sync::{Arc, Mutex},
+    time::Duration,
+};
 use thiserror::Error;
 use types::{
     auth::{
@@ -29,41 +32,55 @@ pub enum ApiClientError {
     },
 }
 
+const USER_AGENT: &str = concat!("bind-app/", env!("CARGO_PKG_VERSION"));
+
 #[derive(Clone)]
 pub struct ApiClient {
     client: reqwest::Client,
     pub base_url: String,
-    auth_token: Option<String>,
+    token: Arc<Mutex<Option<String>>>,
 }
 
 type Result<T> = std::result::Result<T, ApiClientError>;
 
 impl ApiClient {
-    pub fn new(base_url: String) -> Self {
+    pub fn new(base_url: &'static str) -> Self {
+        let base_url = base_url.to_string();
+
         let mut headers = HeaderMap::new();
         headers.insert("Content-Type", HeaderValue::from_static("application/json"));
-        // TODO: make this dynamic
-        headers.insert("User-Agent", HeaderValue::from_static("bind-app/1.0"));
+        headers.insert("User-Agent", HeaderValue::from_static(USER_AGENT));
+        headers.insert("Accept", HeaderValue::from_static("application/json"));
+
         let client_builder = reqwest::ClientBuilder::new()
             .default_headers(headers)
             .timeout(Duration::from_secs(30));
+
         Self {
             client: client_builder.build().unwrap(),
             base_url,
-            auth_token: None,
+            token: Arc::new(Mutex::new(None)),
         }
     }
 
-    pub fn set_auth_token(&mut self, token: String) {
-        self.auth_token = Some(token);
+    pub fn get_token(&self) -> Option<String> {
+        match self.token.get_cloned() {
+            Ok(token) => token,
+            Err(err) => {
+                self.token.clear_poison();
+                self.get_token()
+            }
+        }
     }
 
-    pub fn clear_auth_token(&mut self) {
-        self.auth_token = None;
-    }
-
-    pub fn get_reqwest_client(&self) -> &reqwest::Client {
-        &self.client
+    pub fn set_token(&self, token: Option<String>) {
+        match self.token.set(token.clone()) {
+            Ok(_) => {}
+            Err(err) => {
+                self.token.clear_poison();
+                self.set_token(token);
+            }
+        }
     }
 
     fn make_request(&self, method: Method, path: &str) -> reqwest::RequestBuilder {
@@ -71,7 +88,7 @@ impl ApiClient {
             method,
             format!("{}/{}", self.base_url, path.trim_start_matches("/")),
         );
-        if let Some(token) = &self.auth_token {
+        if let Some(token) = &self.get_token() {
             request = request.bearer_auth(token);
         }
         request

@@ -24,7 +24,7 @@ pub fn ReaderLayout() -> Element {
     let token = use_token();
 
     use_effect(move || {
-        if token.get().is_none() {
+        if token().is_none() {
             nav.push(Route::SignUp {});
         }
     });

@@ -1,6 +1,7 @@
 use dioxus::{mobile::window, prelude::*};
 
-// TODO: clean up event listener
+// TODO: clean up event listener via a drop guard
+// https://dioxuslabs.com/learn/0.6/essentials/async/#asynchronous-state-with-use-resource
 pub fn use_keyboard_open() -> Signal<bool> {
     let mut keyboard_open = use_signal(|| false);
 

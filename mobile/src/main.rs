@@ -1,3 +1,5 @@
+#![feature(lock_value_accessors)]
+
 use api::types::auth::AuthUser;
 use api::ApiClient;
 use dioxus::dioxus_core::LaunchConfig;
