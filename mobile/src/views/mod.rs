@@ -11,22 +11,6 @@ use reader::*;
 #[derive(Debug, Clone, Routable, PartialEq)]
 #[rustfmt::skip]
 pub enum Route {
-    // Dashboard
-    #[layout(DashboardLayout)]
-        #[route("/")]
-        Feed {},
-        #[route("/list")]
-        List {},
-        #[route("/search")]
-        Search {},
-
-    // Reader
-    #[layout(ReaderLayout)]
-        #[route("/reader")]
-        FeedReader {},
-        #[route("/reader/parsed")]
-        ParsedReader {},
-
     // Auth
     #[route("/auth/sign-up")]
     SignUp {},
@@ -44,4 +28,22 @@ pub enum Route {
     ResetPassword {},
     #[route("/auth/reset-password-confirm?:email")]
     ResetPasswordConfirm { email: String },
+
+    // Dashboard
+    #[layout(DashboardLayout)]
+        #[route("/")]
+        Feed {},
+        #[route("/list")]
+        List {},
+        #[route("/search")]
+        Search {},
+
+    // Reader
+    #[layout(ReaderLayout)]
+        #[route("/reader")]
+        FeedReader {},
+        #[route("/reader/parsed")]
+        ParsedReader {},
+
+
 }
