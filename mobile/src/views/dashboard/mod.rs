@@ -19,10 +19,10 @@ pub use search::Search;
 
 #[component]
 pub fn DashboardLayout() -> Element {
-    // TODO: better way to redirect to sign up if not logged in?
     let nav = use_navigator();
     let mut token = use_token();
 
+    // TODO: better way to redirect to sign up if not logged in?
     use_effect(move || {
         if token().is_none() {
             nav.push(Route::SignUp {});

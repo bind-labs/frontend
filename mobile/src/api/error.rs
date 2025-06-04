@@ -1,3 +1,4 @@
+use serde::Deserialize;
 use thiserror::Error;
 
 pub type Result<T> = std::result::Result<T, ApiClientError>;
@@ -10,11 +11,8 @@ pub enum ApiClientError {
     SerdeError(#[from] serde_json::Error),
     #[error("Auth error: {0}")]
     AuthError(String),
-    #[error("API error: (Status: {status_code}): {error_message}")]
-    ApiError {
-        status_code: u16,
-        error_message: String,
-    },
+    #[error("API error: (Status: {status}): {message}")]
+    ApiError { status: u16, message: String },
 }
 
 impl ApiClientError {
@@ -23,7 +21,12 @@ impl ApiClientError {
             ApiClientError::ReqwestError(err) => err.to_string(),
             ApiClientError::SerdeError(err) => err.to_string(),
             ApiClientError::AuthError(err) => err.to_string(),
-            ApiClientError::ApiError { error_message, .. } => error_message.to_string(),
+            ApiClientError::ApiError { message, .. } => message.to_string(),
         }
     }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ApiErrorResponse {
+    pub message: String,
 }

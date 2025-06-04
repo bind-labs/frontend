@@ -1,7 +1,8 @@
 use reqwest::{
     header::{HeaderMap, HeaderValue},
-    Method,
+    Method, StatusCode,
 };
+use serde::de::DeserializeOwned;
 use std::{
     sync::{Arc, Mutex},
     time::Duration,
@@ -13,6 +14,8 @@ pub mod types;
 
 pub use error::ApiClientError;
 use error::Result;
+
+use crate::api::error::ApiErrorResponse;
 
 const USER_AGENT: &str = concat!("bind-app/", env!("CARGO_PKG_VERSION"));
 
@@ -74,6 +77,26 @@ impl ApiClient {
         request
     }
 
+    /// Handles a response from the API, returning the deserialized response if the status code matches.
+    /// Otherwise, returns an error with the status code and message.
+    async fn handle_response<T: DeserializeOwned>(
+        &self,
+        response: reqwest::Response,
+        status_code: StatusCode,
+    ) -> Result<T> {
+        if response.status() == status_code {
+            return Ok(response.json::<T>().await?);
+        }
+
+        let status = response.status().as_u16();
+        let message = response
+            .json::<ApiErrorResponse>()
+            .await
+            .map(|error| error.message)
+            .unwrap_or_else(|_| format!("Unknown error from server ({})", status));
+        Err(ApiClientError::ApiError { status, message })
+    }
+
     /// Create a new feed subscription.
     ///
     /// Corresponds to `PUT /feed`.
@@ -88,22 +111,8 @@ impl ApiClient {
             .send()
             .await?;
 
-        if response.status() == reqwest::StatusCode::CREATED {
-            let created_feed = response.json::<Feed>().await?;
-            Ok(created_feed)
-        } else {
-            // Handle API errors (4xx, 5xx)
-            let status = response.status();
-            // Attempt to get error message from response body
-            let error_message = response
-                .text()
-                .await
-                .unwrap_or_else(|_| "Could not retrieve error body".to_string());
-            Err(ApiClientError::ApiError {
-                status_code: status.as_u16(),
-                error_message,
-            })
-        }
+        self.handle_response(response, reqwest::StatusCode::CREATED)
+            .await
     }
 
     /// Register a new user with email and password.
@@ -123,23 +132,8 @@ impl ApiClient {
             .send()
             .await?;
 
-        let status = response.status();
-
-        if status == reqwest::StatusCode::OK {
-            // 200 OK for successful registration
-            let register_response = response.json::<UserRegisterResponse>().await?;
-            Ok(register_response)
-        } else {
-            // Handle API errors (400, 403, 409, 500)
-            let error_message = response
-                .text()
-                .await
-                .unwrap_or_else(|e| format!("Could not retrieve error body: {}", e));
-            Err(ApiClientError::ApiError {
-                status_code: status.as_u16(),
-                error_message,
-            })
-        }
+        self.handle_response(response, reqwest::StatusCode::OK)
+            .await
     }
 
     /// Sends an email to the user with a verification code
@@ -148,7 +142,6 @@ impl ApiClient {
     /// Corresponds to `POST /user/email/verify`.
     /// This endpoint does not require prior authentication.
     pub async fn send_email_verification(&self, email: &str) -> Result<()> {
-        // Returns Ok(()) on success
         let response = self
             .make_request(reqwest::Method::POST, "/user/email/verify")
             .json(&EmailVerificationRequest {
@@ -157,20 +150,8 @@ impl ApiClient {
             .send()
             .await?;
 
-        let status = response.status();
-
-        if status == reqwest::StatusCode::OK {
-            Ok(())
-        } else {
-            let error_message = response
-                .text()
-                .await
-                .unwrap_or_else(|e| format!("Could not retrieve error body: {}", e));
-            Err(ApiClientError::ApiError {
-                status_code: status.as_u16(),
-                error_message,
-            })
-        }
+        self.handle_response(response, reqwest::StatusCode::OK)
+            .await
     }
 
     /// Login with email/username and password.
@@ -194,23 +175,8 @@ impl ApiClient {
             .send()
             .await?;
 
-        let status = response.status();
-
-        if status == reqwest::StatusCode::OK {
-            // 200 OK for successful login
-            let login_response = response.json::<UserLoginResponse>().await?;
-            Ok(login_response)
-        } else {
-            // Handle API errors (400, 401, 500 from the spec)
-            let error_message = response
-                .text()
-                .await
-                .unwrap_or_else(|e| format!("Could not retrieve error body: {}", e));
-            Err(ApiClientError::ApiError {
-                status_code: status.as_u16(),
-                error_message,
-            })
-        }
+        self.handle_response(response, reqwest::StatusCode::OK)
+            .await
     }
 
     /// Send reset password email code

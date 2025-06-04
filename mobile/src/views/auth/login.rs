@@ -25,6 +25,12 @@ pub fn Login() -> Element {
     let mut password = use_signal(String::new);
     let mut error = use_signal(|| None::<String>);
 
+    use_effect(move || {
+        if token().is_some() {
+            navigator().push(Route::Feed {});
+        }
+    });
+
     let login = use_callback(move |_| {
         if email_or_username().is_empty() || password().is_empty() {
             error.set(Some("Email and password cannot be empty".to_string()));
@@ -35,12 +41,10 @@ pub fn Login() -> Element {
             match api.login_user(&email_or_username(), &password()).await {
                 Ok(response) => {
                     token.set(Some(response.token));
-                    navigator().push(Route::Feed {});
+                    error.set(None);
                 }
-                Err(err) => {
-                    error.set(Some(err.message()));
-                }
-            }
+                Err(err) => error.set(Some(err.message())),
+            };
         });
     });
 

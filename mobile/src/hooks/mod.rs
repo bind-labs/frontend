@@ -18,6 +18,9 @@ pub fn use_token() -> Signal<Option<String>> {
     let token = use_signal(|| TOKEN.read().clone());
 
     use_effect(move || {
+        if *TOKEN.read() == token() {
+            return;
+        }
         SecureStore::set("token", &token());
         *TOKEN.write() = token();
     });
