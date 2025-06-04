@@ -51,7 +51,7 @@ pub fn VerifyEmail(email: String, username: String, password: String) -> Element
                     navigator().push(Route::Feed {});
                 }
                 Err(err) => {
-                    error.set(Some(err.to_string()));
+                    error.set(Some(err.message()));
                 }
             }
         });

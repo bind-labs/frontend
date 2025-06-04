@@ -6,31 +6,13 @@ use std::{
     sync::{Arc, Mutex},
     time::Duration,
 };
-use thiserror::Error;
-use types::{
-    auth::{
-        EmailVerificationRequest, UserLoginRequest, UserLoginResponse, UserRegisterRequest,
-        UserRegisterResponse,
-    },
-    feed::{CreateFeedRequest, Feed},
-};
+use types::{auth::*, feed::*};
 
+mod error;
 pub mod types;
 
-#[derive(Error, Debug)]
-pub enum ApiClientError {
-    #[error("Reqwest error: {0}")]
-    ReqwestError(#[from] reqwest::Error),
-    #[error("Serde error: {0}")]
-    SerdeError(#[from] serde_json::Error),
-    #[error("Auth error: {0}")]
-    AuthError(String),
-    #[error("API error: (Status: {status_code}): {error_message}")]
-    ApiError {
-        status_code: u16,
-        error_message: String,
-    },
-}
+pub use error::ApiClientError;
+use error::Result;
 
 const USER_AGENT: &str = concat!("bind-app/", env!("CARGO_PKG_VERSION"));
 
@@ -40,8 +22,6 @@ pub struct ApiClient {
     pub base_url: String,
     token: Arc<Mutex<Option<String>>>,
 }
-
-type Result<T> = std::result::Result<T, ApiClientError>;
 
 impl ApiClient {
     pub fn new(base_url: &'static str) -> Self {

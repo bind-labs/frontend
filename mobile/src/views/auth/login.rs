@@ -38,7 +38,7 @@ pub fn Login() -> Element {
                     navigator().push(Route::Feed {});
                 }
                 Err(err) => {
-                    error.set(Some(err.to_string()));
+                    error.set(Some(err.message()));
                 }
             }
         });

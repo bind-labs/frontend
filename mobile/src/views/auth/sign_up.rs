@@ -28,7 +28,7 @@ pub fn SignUp() -> Element {
 
     let keyboard_open = use_keyboard_open();
 
-    let sign_up = use_callback(move |_| {
+    let send_email_verification = use_callback(move |_| {
         if let Err(err) = validate_email(&email()) {
             error.set(Some(err));
         } else if let Err(err) = validate_username(&username()) {
@@ -47,7 +47,7 @@ pub fn SignUp() -> Element {
                         });
                     }
                     Err(err) => {
-                        error.set(Some(err.to_string()));
+                        error.set(Some(err.message()));
                     }
                 }
             });
@@ -113,7 +113,7 @@ pub fn SignUp() -> Element {
                 Column { gap: "8px", align: "stretch",
 
                     SolidButton {
-                        onclick: move |_| { sign_up.call(()) },
+                        onclick: move |_| { send_email_verification.call(()) },
                         "Sign up"
                     }
                     TransparentButton {
