@@ -1,16 +1,18 @@
 use dioxus::prelude::*;
 
-use crate::views::auth::{
-    components::{AuthContainer, Error},
-    validation::validate_email,
-};
 use crate::views::Route;
+use crate::{
+    hooks::use_api,
+    views::auth::{
+        components::{AuthContainer, Error},
+        validation::validate_email,
+    },
+};
 
 use super::components::Header;
 use ui::{
     forms::{
-        button::{SolidButton, TransparentButton, UnstyledButton},
-        code_input::CodeInput,
+        button::{SolidButton, TransparentButton},
         input::Input,
     },
     icons::{EnvelopeIcon, LockIcon},
@@ -19,16 +21,25 @@ use ui::{
 
 #[component]
 pub fn ResetPassword() -> Element {
+    let api = use_api();
     let mut email = use_signal(String::new);
     let mut error = use_signal(|| None::<String>);
 
-    let reset_password = use_callback(move |_| {
+    let send_password_reset_code = use_callback(move |_| {
         if let Err(err) = validate_email(&email()) {
             error.set(Some(err));
-        } else {
-            error.set(None);
-            navigator().push(Route::ResetPasswordConfirm { email: email() });
-        }
+        } 
+
+        spawn(async move {
+            match api.send_password_reset_code(&email()).await {
+                Ok(_) => {
+                    navigator().push(Route::ResetPasswordConfirm { email: email() });
+                }
+                Err(err) => {
+                    error.set(Some(err.message()));
+                }
+            }
+        });
     });
 
     rsx! {
@@ -53,7 +64,7 @@ pub fn ResetPassword() -> Element {
 
             Column { gap: "8px",
                 SolidButton {
-                    onclick: reset_password,
+                    onclick: send_password_reset_code,
                     "Reset Password"
                 }
                 TransparentButton { onclick: move |_| { navigator().push(Route::Login {}); },

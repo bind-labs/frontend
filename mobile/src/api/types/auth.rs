@@ -19,6 +19,19 @@ pub struct EmailVerificationRequest {
 }
 
 #[derive(Serialize, Debug)]
+pub struct SendPasswordCodeRequest {
+    pub email: String,
+}
+
+#[derive(Serialize, Debug)]
+pub struct ResetPasswordRequest {
+    pub email: String,
+    pub code: String,
+    pub new_password: String
+}
+
+
+#[derive(Serialize, Debug)]
 pub struct UserLoginRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email: Option<String>,

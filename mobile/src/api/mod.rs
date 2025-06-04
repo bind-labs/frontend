@@ -213,5 +213,60 @@ impl ApiClient {
         }
     }
 
+    /// Send reset password email code
+    /// Corresponds to `POST /user/email/send-password-reset-code`.
+    pub async fn send_password_reset_code(&self, email: &str) -> Result<()> {
+        let response = self
+            .make_request(Method::POST, "/user/email/send-password-reset-code")
+            .json(&SendPasswordCodeRequest {
+                email: email.to_string(),
+            })
+            .send()
+            .await?;
 
+        let status = response.status();
+
+        if status == reqwest::StatusCode::OK {
+            Ok(())
+        } else {
+            let error_message = response
+                .text()
+                .await
+                .unwrap_or_else(|e| format!("Could not retrieve error body: {}", e));
+            Err(ApiClientError::ApiError {
+                status_code: status.as_u16(),
+                error_message,
+            })
+        }
+    }
+
+    /// Reset user's password
+    /// Corresponds to `POST /user/email/reset-password`.
+    pub async fn reset_password(&self, email: &str, code: &str, new_password: &str) -> Result<()> {
+        let request = ResetPasswordRequest {
+            email: email.to_string(),
+            code: code.to_string(),
+            new_password: new_password.to_string(),
+        };
+        let response = self
+            .make_request(Method::POST, "/user/email/reset-password")
+            .json(&request)
+            .send()
+            .await?;
+
+        let status = response.status();
+
+        if status == reqwest::StatusCode::OK {
+            Ok(())
+        } else {
+            let error_message = response
+                .text()
+                .await
+                .unwrap_or_else(|e| format!("Could not retrieve error body: {}", e));
+            Err(ApiClientError::ApiError {
+                status_code: status.as_u16(),
+                error_message,
+            })
+        }
+    }
 }
