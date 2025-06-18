@@ -46,6 +46,20 @@ pub struct UserRegisterResponse {
 }
 
 #[derive(Serialize, Debug)]
+pub struct UserLoginRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub username: Option<String>,
+    pub password: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct UserLoginResponse {
+    pub token: String,
+}
+
+#[derive(Serialize, Debug)]
 pub struct EmailVerificationRequest {
     pub email: String,
 }
@@ -59,22 +73,7 @@ pub struct SendPasswordCodeRequest {
 pub struct ResetPasswordRequest {
     pub email: String,
     pub code: String,
-    pub new_password: String
-}
-
-
-#[derive(Serialize, Debug)]
-pub struct UserLoginRequest {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub username: Option<String>,
-    pub password: String,
-}
-
-#[derive(Deserialize, Debug)]
-pub struct UserLoginResponse {
-    pub token: String,
+    pub new_password: String,
 }
 
 // OAuth

@@ -530,6 +530,37 @@ impl ApiClient {
             .await
     }
 
+    /// `POST /user/email/send-password-reset-code`: Send reset password email code
+    pub async fn send_password_reset_code(&self, email: &str) -> Result<()> {
+        let response = self
+            .make_request(Method::POST, "/user/email/send-password-reset-code")
+            .json(&SendPasswordCodeRequest {
+                email: email.to_string(),
+            })
+            .send()
+            .await?;
+
+        self.handle_response(response, reqwest::StatusCode::OK)
+            .await
+    }
+
+    /// `POST /user/email/reset-password`: Reset user's password
+    pub async fn reset_password(&self, email: &str, code: &str, new_password: &str) -> Result<()> {
+        let request = ResetPasswordRequest {
+            email: email.to_string(),
+            code: code.to_string(),
+            new_password: new_password.to_string(),
+        };
+        let response = self
+            .make_request(Method::POST, "/user/email/reset-password")
+            .json(&request)
+            .send()
+            .await?;
+
+        self.handle_response(response, reqwest::StatusCode::OK)
+            .await
+    }
+
     // ---------------
     // User/OAuth
     // ---------------
