@@ -63,7 +63,7 @@
             wasm-bindgen-cli_0_2_100
             (pkgs.fenix.fromToolchainFile {
               file = ./rust-toolchain.toml;
-              sha256 = "sha256-eFuFA5spScrde7b7lSV5QAND1m0+Ds6gbVODfDE3scg=";
+              sha256 = "sha256-SISBvV1h7Ajhs8g0pNezC1/KGA0hnXnApQ/5//STUbs=";
             })
 
             # Android
