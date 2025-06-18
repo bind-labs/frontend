@@ -2762,6 +2762,7 @@ dependencies = [
  "chrono",
  "dioxus",
  "jni",
+ "rand 0.9.1",
  "regex",
  "reqwest",
  "serde",
@@ -2770,7 +2771,6 @@ dependencies = [
  "tokio",
  "tracing",
  "ui",
- "web-sys",
  "zxcvbn",
 ]
 

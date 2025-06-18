@@ -5,6 +5,24 @@ pub struct CreateFeedRequest {
     pub link: String,
 }
 
+/// Request to discover feeds from a website URL
+#[derive(Debug, Serialize)]
+pub struct DiscoverFeedsRequest {
+    /// URL of the website to discover feeds from
+    pub link: String,
+}
+
+// ----------
+
+/// Information about a discovered feed
+#[derive(Debug, Deserialize)]
+pub struct FeedInformation {
+    /// URL of the feed
+    pub url: String,
+    /// Format of the feed (RSS, Atom, or JSON)
+    pub format: FeedFormat,
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct FeedItemEnclosure {
     /// URL of the media file
@@ -17,11 +35,8 @@ pub struct FeedItemEnclosure {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum FeedFormat {
-    /// Atom feed format
     Atom,
-    /// RSS feed format
     Rss,
-    /// JSON feed format
     Json,
 }
 

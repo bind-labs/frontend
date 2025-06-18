@@ -1,6 +1,6 @@
 #![feature(lock_value_accessors)]
 
-use api::types::auth::AuthUser;
+use api::types::user::AuthUser;
 use api::ApiClient;
 use dioxus::dioxus_core::LaunchConfig;
 use dioxus::mobile::wry::WebView;

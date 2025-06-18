@@ -1,5 +1,37 @@
 use serde::{Deserialize, Serialize};
 
+// History
+
+/// Represents a single item in a user's history
+#[derive(Clone, Debug, Deserialize)]
+pub struct HistoryItem {
+    pub id: i64,
+    /// ID of the user this history item belongs to
+    pub owner: i32,
+    /// ID of the feed item this item is referencing
+    pub item: i64,
+    /// Progress in the item, 0 - 1
+    pub progress: f64,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct CreateHistoryRequest {
+    /// ID of the feed item this item is referencing
+    pub item: i64,
+    /// Progress in the item, 0 - 1
+    pub progress: f64,
+}
+
+#[derive(Debug, Serialize)]
+pub struct UpdateHistoryRequest {
+    /// Progress in the item, 0 - 1
+    pub progress: f64,
+}
+
+// Email
+
 #[derive(Serialize, Debug)]
 pub struct UserRegisterRequest {
     pub email: String,
@@ -44,6 +76,25 @@ pub struct UserLoginRequest {
 pub struct UserLoginResponse {
     pub token: String,
 }
+
+// OAuth
+
+#[derive(Serialize)]
+pub struct AuthorizeRequest {
+    pub provider: String,
+    pub client: OAuthRedirectClient,
+}
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum OAuthRedirectClient {
+    Web,
+    Android,
+    IOS,
+}
+
+// ----------
+
 #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub struct AuthUser {
     /// Expiration time as UTC timestamp (required for JWT validation)
