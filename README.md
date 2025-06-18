@@ -8,7 +8,7 @@
   - [ ] Text
   - [ ] Keyboard popup resizing
 - [ ] API Client
-  - [ ] Endpoints
+  - [x] Endpoints
   - [ ] Refresh tokens
   - [ ] App context (AuthState, OtherState, etc)
   - [ ] On auth error, redirect to login page
@@ -18,10 +18,10 @@
     - [x] Design
     - [x] Layout
     - [ ] Functionality
-      - [ ] Login
-      - [ ] Register
-      - [ ] Verify Email
-      - [ ] Forgot password
+      - [x] Login
+      - [x] Register
+      - [x] Verify Email
+      - [ ] Reset password
   - [ ] Dashboard
     - [x] Design
     - [ ] Layout
@@ -49,4 +49,3 @@
 - [x] Share
   - [x] Android
   - [x] iOS
-- [ ] Upstream Dioxus permissions
