@@ -28,7 +28,11 @@ pub fn NavbarButton<Route: Routable + PartialEq + Clone>(
 }
 
 #[component]
-pub fn NavbarButtonWithoutRoute(children: Element, onclick: EventHandler<MouseEvent>) -> Element {
+pub fn NavbarButtonWithoutRoute(
+    children: Element,
+    onclick: EventHandler<MouseEvent>,
+    onmounted: Option<EventHandler<MountedEvent>>,
+) -> Element {
     rsx! {
         UnstyledButton {
             display: "flex",

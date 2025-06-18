@@ -3,10 +3,12 @@ use std::sync::atomic::AtomicBool;
 
 mod decor;
 mod email;
+mod gesture;
 mod share;
 mod storage;
 
 pub use email::open_email;
+pub use gesture::init_back_press_listener;
 pub use share::share_feed_item;
 pub use storage::SecureStore;
 

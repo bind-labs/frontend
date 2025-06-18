@@ -1,4 +1,4 @@
-# TODO: add `cargo install --git https://github.com/bind-labs/dioxus --branch android-perms-deps dioxus-cli`
+# TODO: add `cargo install --git https://github.com/bind-labs/dioxus dioxus-cli`
 
 {
   description = "Bind Frontend";
@@ -78,6 +78,7 @@
             export ANDROID_SDK_ROOT="$ANDROID_HOME"
             export ANDROID_NDK_HOME="$ANDROID_HOME/ndk-bundle"
             export PATH="$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH"
+            export LD_LIBRARY_PATH="${pkgs.openssl.out}/lib"
 
             # Android emulator flags
             # Not working on Nvidia 570 drivers

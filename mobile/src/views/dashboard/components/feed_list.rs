@@ -52,10 +52,10 @@ pub fn FeedListItem(props: FeedListItemProps) -> Element {
 }
 
 #[component]
-pub fn FeedList() -> Element {
+pub fn FeedList(num: usize) -> Element {
     rsx! {
         Column {
-            for i in 0..12 {
+            for i in 0..num {
                 FeedListItem {
                     key: "{i}",
                     image_url: "https://upload.wikimedia.org/wikipedia/en/d/d1/Plasticbeach452.jpg",

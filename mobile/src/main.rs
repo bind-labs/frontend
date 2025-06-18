@@ -3,9 +3,9 @@
 use api::types::user::AuthUser;
 use api::ApiClient;
 use dioxus::dioxus_core::LaunchConfig;
-use dioxus::mobile::wry::WebView;
-use dioxus::mobile::{use_window, window, Config, WindowBuilder};
+use dioxus::mobile::{use_window, window, wry::WebView, Config, WindowBuilder};
 use dioxus::prelude::*;
+use dioxus_router::prelude::*;
 
 mod api;
 mod components;
@@ -16,6 +16,9 @@ mod views;
 use components::container::FixedSizeContainer;
 use platform::use_platform_setup;
 use views::Route;
+
+use crate::components::popup::{use_popup_state, use_popup_state_provider, PopupState};
+use crate::platform::init_back_press_listener;
 
 const THEME_CSS: Asset = asset!("/assets/theme.css");
 const MAIN_CSS: Asset = asset!("/assets/main.css");
@@ -42,6 +45,22 @@ struct AppContext {
 #[component]
 fn App() -> Element {
     use_platform_setup();
+    let mut popup_state = use_popup_state_provider();
+
+    // Handle back events
+    use_future(move || async move {
+        let mut rx = init_back_press_listener();
+        loop {
+            if let Ok(()) = rx.try_recv() {
+                if matches!(*popup_state.read(), PopupState::Open(_)) {
+                    popup_state.set(PopupState::Close);
+                } else {
+                    navigator().go_back();
+                }
+            }
+            tokio::time::sleep(std::time::Duration::from_millis(1)).await;
+        }
+    });
 
     rsx! {
         // Global app resources

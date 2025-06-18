@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use dioxus_router::prelude::*;
 
 pub mod auth;
 pub mod dashboard;
@@ -44,6 +45,4 @@ pub enum Route {
         FeedReader {},
         #[route("/reader/parsed")]
         ParsedReader {},
-
-
 }

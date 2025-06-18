@@ -1,6 +1,6 @@
 body {
   background-color: var(--bg);
-  color: var(--fg);
+  color: var(--text);
   margin: 0;
 
   text-underline-offset: 2px;
@@ -22,7 +22,7 @@ blockquote {
 }
 
 hr {
-  background-color: var(--fg);
+  background-color: var(--text);
   height: 2px;
 
   margin: 0;
@@ -31,6 +31,7 @@ hr {
   align-self: center;
 }
 
+/* Button */
 button {
   display: flex;
   align-items: center;
@@ -55,4 +56,31 @@ button.solid {
 
 button.transparent {
   text-decoration: underline;
+}
+
+/* Popup */
+@keyframes popup-slide-in {
+  from {
+    transform: translateY();
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+dialog#popup {
+  display: block;
+
+  animation: popup-slide-in 0.1s ease-out forwards;
+  width: 100%;
+
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  border: none;
+
+  border-top: 1px solid var(--text);
+  background-color: var(--bg);
 }

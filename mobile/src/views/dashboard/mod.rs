@@ -1,8 +1,12 @@
 use dioxus::prelude::*;
 
 use crate::{
-    components::navbar::{Navbar, NavbarButton},
+    components::{
+        navbar::{Navbar, NavbarButton, NavbarButtonWithoutRoute},
+        popup::{use_popup_state, Popup, PopupState},
+    },
     hooks::use_token,
+    platform::init_back_press_listener,
     views::Route,
 };
 use ui::icons::{Bars3Icon, BookmarkIcon, PlusIcon, QueueIcon, SearchIcon};
@@ -19,6 +23,8 @@ pub use search::Search;
 
 #[component]
 pub fn DashboardLayout() -> Element {
+    let mut popup_state = use_popup_state();
+
     let nav = use_navigator();
     let mut token = use_token();
 
@@ -45,7 +51,11 @@ pub fn DashboardLayout() -> Element {
                 },
             }
 
-            main { overflow: "auto", Outlet::<Route> {} }
+            main { overflow: "auto", position: "relative",
+                Outlet::<Route> {}
+                Popup {}
+            }
+
 
             Navbar {
                 NavbarButton {
@@ -60,11 +70,16 @@ pub fn DashboardLayout() -> Element {
                         QueueIcon { solid }
                     },
                 }
-                NavbarButton {
-                    to: Route::List {},
-                    icon: |solid| rsx! {
-                        PlusIcon { solid }
+                NavbarButtonWithoutRoute {
+                    onclick: move |_| {
+                        match popup_state() {
+                            PopupState::Open(_) => {
+                                popup_state.set(PopupState::Close);
+                            }
+                            PopupState::Close => popup_state.set(PopupState::Open(rsx!{ div { "Hello" } })),
+                        }
                     },
+                    PlusIcon {},
                 }
                 NavbarButton {
                     to: Route::List {},

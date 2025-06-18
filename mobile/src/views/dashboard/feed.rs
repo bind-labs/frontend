@@ -4,6 +4,6 @@ use dioxus::prelude::*;
 #[allow(non_snake_case)]
 pub fn Feed() -> Element {
     rsx! {
-        FeedList {}
+        FeedList { num: 1 }
     }
 }

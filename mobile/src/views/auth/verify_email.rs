@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
-    api::{types::auth::UserRegisterRequest, ApiClient},
+    api::{types::user::UserRegisterRequest, ApiClient},
     hooks::{use_api, use_token},
     platform,
     views::{
