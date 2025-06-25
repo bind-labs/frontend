@@ -136,16 +136,62 @@ pub fn secure_retrieve(key: &str) -> Result<Option<String>> {
                 return Ok(None);
             }
 
-            // Decrypt the value
-            let decrypted = decrypt_with_keystore_key(env, encrypted_value)?;
+            // Try to decrypt the value
+            match decrypt_with_keystore_key(env, encrypted_value) {
+                Ok(decrypted) => Ok(Some(decrypted)),
+                Err(e) => {
+                    // Check if the error is an AEADBadTagException
+                    if let SecureStorageError::Jni(jni_err) = &e {
+                        if is_aead_bad_tag_exception(env, jni_err) {
+                            // Clear the shared preferences
+                            let editor = env
+                                .call_method(
+                                    &prefs,
+                                    "edit",
+                                    "()Landroid/content/SharedPreferences$Editor;",
+                                    &[],
+                                )?
+                                .l()?;
 
-            Ok(Some(decrypted))
+                            env.call_method(
+                                &editor,
+                                "clear",
+                                "()Landroid/content/SharedPreferences$Editor;",
+                                &[],
+                            )?;
+                            env.call_method(&editor, "apply", "()V", &[])?;
+
+                            return Ok(None);
+                        }
+                    }
+                    Err(e)
+                }
+            }
         })();
 
         let _ = tx.send(result);
     });
 
     rx.recv()?
+}
+
+/// Helper function to check if a JNI error is caused by AEADBadTagException
+fn is_aead_bad_tag_exception(env: &mut JNIEnv, _jni_err: &jni::errors::Error) -> bool {
+    // Check if there's a pending exception
+    if let Ok(true) = env.exception_check() {
+        if let Ok(exception) = env.exception_occurred() {
+            // Clear the exception so we can continue
+            let _ = env.exception_clear();
+
+            // Check if it's an AEADBadTagException
+            if let Ok(class) = env.find_class("javax/crypto/AEADBadTagException") {
+                if let Ok(is_instance) = env.is_instance_of(&exception, class) {
+                    return is_instance;
+                }
+            }
+        }
+    }
+    false
 }
 
 /// Encrypts a string using the keystore-backed secret key
@@ -551,16 +597,23 @@ fn decrypt_with_keystore_key(env: &mut JNIEnv, encrypted_data: JObject) -> Resul
         ],
     )?;
 
-    // Decrypt
+    // Decrypt - this is where AEADBadTagException can occur
     let ciphertext_array = env.byte_array_from_slice(ciphertext)?;
-    let plaintext = env
-        .call_method(
-            &cipher,
-            "doFinal",
-            "([B)[B",
-            &[JValue::Object(&ciphertext_array.into())],
-        )?
-        .l()?;
+
+    // Check for exception after doFinal
+    let plaintext_result = env.call_method(
+        &cipher,
+        "doFinal",
+        "([B)[B",
+        &[JValue::Object(&ciphertext_array.into())],
+    );
+
+    // If there's an exception, propagate it
+    if let Err(e) = plaintext_result {
+        return Err(SecureStorageError::Jni(e));
+    }
+
+    let plaintext = plaintext_result?.l()?;
 
     // Convert to string
     let plaintext_bytes = env.convert_byte_array(JByteArray::from(plaintext))?;
