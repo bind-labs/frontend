@@ -76,7 +76,25 @@ pub fn DashboardLayout() -> Element {
                             PopupState::Open(_) => {
                                 popup_state.set(PopupState::Close);
                             }
-                            PopupState::Close => popup_state.set(PopupState::Open(rsx!{ div { "Hello" } })),
+                            PopupState::Close => popup_state.set(PopupState::Open(
+                                rsx!{ PopupList {
+                                    PopupListItem {
+                                        icon: rsx! { QueueIcon {} },
+                                        title: "Add New Feed",
+                                        onclick: move |_| { nav.push(Route::AddFeed {}); },
+                                    }
+                                    PopupListItem {
+                                        icon: rsx! { BookmarkIcon {} },
+                                        title: "Create New List",
+                                        onclick: move |_| { nav.push(Route::AddFeed {}); },
+                                    }
+                                    PopupListItem {
+                                        icon: rsx! { SearchIcon {} },
+                                        title: "Create New Index",
+                                        onclick: move |_| { nav.push(Route::AddFeed {}); },
+                                    }
+                                } }
+                            )),
                         }
                     },
                     PlusIcon {},
