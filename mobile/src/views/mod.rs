@@ -34,10 +34,12 @@ pub enum Route {
     #[layout(DashboardLayout)]
         #[route("/")]
         Feed {},
-        #[route("/list")]
-        List {},
+        #[route("/list/:id")]
+        List { id: usize },
         #[route("/search")]
         Search {},
+        #[route("/add-feed")]
+        AddFeed {},
 
     // Reader
     #[layout(ReaderLayout)]

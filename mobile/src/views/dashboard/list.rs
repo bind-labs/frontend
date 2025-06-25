@@ -1,9 +1,22 @@
-use super::components::FeedList;
 use dioxus::prelude::*;
 
-#[allow(non_snake_case)]
-pub fn List() -> Element {
+use super::components::FeedItemList;
+use crate::{hooks::use_token, views::dashboard::components::Header};
+
+#[component]
+pub fn List(id: usize) -> Element {
+    let mut token = use_token();
+
     rsx! {
-        FeedList { num: 0 }
+        Header {
+            title: "Read Later",
+            additional: "(16 items)",
+            onsettings: move |_| {
+                tracing::info!("Settings clicked");
+                token.set(None);
+            },
+        }
+
+        FeedItemList { num: 0 }
     }
 }

@@ -3,9 +3,14 @@ use ui::forms::button::UnstyledButton;
 use ui::icons::Cog6Tooth;
 use ui::layout::*;
 
-#[allow(non_snake_case)]
+use crate::views::Route;
+
 #[component]
-pub fn Header(title: String, additional: Option<String>, onsettings: EventHandler<()>) -> Element {
+pub fn Header(
+    title: String,
+    additional: Option<String>,
+    onsettings: Option<EventHandler>,
+) -> Element {
     rsx! {
         header {
             display: "flex",
@@ -21,9 +26,9 @@ pub fn Header(title: String, additional: Option<String>, onsettings: EventHandle
                 })}
             }
 
-            UnstyledButton { onclick: move |_| { onsettings.call(()); }, padding: "14px 0px",
+            {onsettings.map(|onsettings| rsx! { UnstyledButton { onclick: move |_| { onsettings.call(()); }, padding: "14px 0px",
                 Cog6Tooth {}
-            },
+            } })}
         }
     }
 }

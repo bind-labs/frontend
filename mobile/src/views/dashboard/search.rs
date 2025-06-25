@@ -1,9 +1,12 @@
-use super::components::FeedList;
 use dioxus::prelude::*;
+
+use super::components::FeedItemList;
+use crate::views::dashboard::components::Header;
 
 #[allow(non_snake_case)]
 pub fn Search() -> Element {
     rsx! {
-        FeedList { num: 6 }
+        Header { title: "Search" }
+        FeedItemList { num: 6 }
     }
 }

@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 use crate::{
     components::{
         navbar::{Navbar, NavbarButton, NavbarButtonWithoutRoute},
-        popup::{use_popup_state, Popup, PopupState},
+        popup::{use_popup_state, Popup, PopupList, PopupListItem, PopupState},
     },
     hooks::use_token,
     platform::init_back_press_listener,
@@ -11,12 +11,15 @@ use crate::{
 };
 use ui::icons::{Bars3Icon, BookmarkIcon, PlusIcon, QueueIcon, SearchIcon};
 
+mod add_feed;
 mod components;
 mod feed;
 mod list;
 mod search;
 
 use components::Header;
+
+pub use add_feed::AddFeed;
 pub use feed::Feed;
 pub use list::List;
 pub use search::Search;
@@ -38,18 +41,9 @@ pub fn DashboardLayout() -> Element {
     rsx! {
         div {
             display: "grid",
-            grid_template_rows: "auto 1fr auto",
+            grid_template_rows: "1fr auto",
             height: "100vh",
             width: "100vw",
-
-            Header {
-                title: "Read Later",
-                additional: Some("(16 items)".to_string()),
-                onsettings: move || {
-                    tracing::info!("Settings clicked");
-                    token.set(None);
-                },
-            }
 
             main { overflow: "auto", position: "relative",
                 Outlet::<Route> {}
@@ -100,13 +94,13 @@ pub fn DashboardLayout() -> Element {
                     PlusIcon {},
                 }
                 NavbarButton {
-                    to: Route::List {},
+                    to: Route::List { id: 1 },
                     icon: |solid| rsx! {
                         BookmarkIcon { solid }
                     },
                 }
                 NavbarButton {
-                    to: Route::List {},
+                    to: Route::List { id: 2 },
                     icon: |solid| rsx! {
                         Bars3Icon { solid }
                     },

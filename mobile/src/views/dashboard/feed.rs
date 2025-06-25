@@ -1,9 +1,22 @@
-use super::components::FeedList;
 use dioxus::prelude::*;
 
-#[allow(non_snake_case)]
+use super::components::FeedItemList;
+use crate::{hooks::use_token, views::dashboard::components::Header};
+
+#[component]
 pub fn Feed() -> Element {
+    let mut token = use_token();
+
     rsx! {
-        FeedList { num: 1 }
+        Header {
+            title: "Some Feed",
+            additional: "(Updated 12 mins ago)",
+            onsettings: move |_| {
+                tracing::info!("Settings clicked");
+                token.set(None);
+            },
+        }
+
+        FeedItemList { num: 1 }
     }
 }
