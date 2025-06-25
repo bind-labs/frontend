@@ -1,11 +1,11 @@
 use super::IconProps;
 use dioxus::prelude::*;
 
-#[allow(non_snake_case)]
 #[component]
 pub fn TextSettingsIcon(props: IconProps) -> Element {
     rsx! {
         svg {
+            class: "icon",
             xmlns: "http://www.w3.org/2000/svg",
             view_box: "0 0 28 20",
             width: props.size,

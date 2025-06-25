@@ -1,11 +1,11 @@
 use super::IconProps;
 use dioxus::prelude::*;
 
-#[allow(non_snake_case)]
 #[component]
 pub fn AppleIcon(props: IconProps) -> Element {
     rsx! {
         svg {
+            class: "icon",
             xmlns: "http://www.w3.org/2000/svg",
             view_box: "0 0 18 20",
             width: props.size,
