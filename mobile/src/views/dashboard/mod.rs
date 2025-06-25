@@ -71,7 +71,7 @@ pub fn DashboardLayout() -> Element {
                                 popup_state.set(PopupState::Close);
                             }
                             PopupState::Close => popup_state.set(PopupState::Open(
-                                rsx!{ PopupList {
+                                rsx! { PopupList {
                                     PopupListItem {
                                         icon: rsx! { QueueIcon {} },
                                         title: "Add New Feed",
