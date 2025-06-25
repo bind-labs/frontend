@@ -89,6 +89,25 @@ dialog#popup {
   z-index: 1001;
 }
 
+/* Top shadow */
+dialog#popup::before {
+  content: "";
+  position: absolute;
+  top: -16px;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.09) 0%,
+    rgba(0, 0, 0, 0.06) 20%,
+    rgba(0, 0, 0, 0.03) 50%,
+    rgba(0, 0, 0, 0.006) 80%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
 dialog#popup.slide-out {
   animation-direction: reverse;
 }
