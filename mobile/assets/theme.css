@@ -4,4 +4,8 @@
   --text-secondary: #666;
   --text-tertiary: #888;
   --text-error: #f00;
+
+  --z-index-navbar: 2000;
+  --z-index-popup: 1001;
+  --z-index-popup-backdrop: 1000;
 }

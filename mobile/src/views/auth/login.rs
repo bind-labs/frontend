@@ -2,9 +2,14 @@ use dioxus::prelude::*;
 
 use crate::{
     api::ApiClient,
-    hooks::{use_api, use_token},
-    views::auth::components::{AuthContainer, Error},
-    views::Route,
+    hooks::{use_api, use_keyboard_open, use_token},
+    views::{
+        auth::{
+            components::{AuthContainer, Error},
+            use_auth_form, AuthFormContext,
+        },
+        Route,
+    },
 };
 
 use super::components::Header;
@@ -20,25 +25,32 @@ use ui::{
 #[component]
 pub fn Login() -> Element {
     let api = use_api();
-    let mut token = use_token();
-    let mut email_or_username = use_signal(String::new);
-    let mut password = use_signal(String::new);
-    let mut error = use_signal(|| None::<String>);
 
-    use_effect(move || {
-        if token().is_some() {
-            navigator().push(Route::Feed {});
-        }
-    });
+    let mut auth_form = use_auth_form();
+    let mut error = use_signal(|| None::<String>);
+    let mut token = use_token();
+
+    let mut keyboard_open = use_keyboard_open();
 
     let login = use_callback(move |_| {
-        if email_or_username().is_empty() || password().is_empty() {
-            error.set(Some("Email and password cannot be empty".to_string()));
+        let email = auth_form.email();
+        let username = auth_form.username();
+        let password = auth_form.password();
+
+        // Validate
+        if (email.is_empty() && username.is_empty()) || password.is_empty() {
+            error.set(Some(
+                "Email/username and password cannot be empty".to_string(),
+            ));
             return;
         }
 
+        // Login
         spawn(async move {
-            match api.login_user(&email_or_username(), &password()).await {
+            match api
+                .login_user(&auth_form.email_or_username(), &password)
+                .await
+            {
                 Ok(response) => {
                     token.set(Some(response.token));
                     error.set(None);
@@ -53,15 +65,17 @@ pub fn Login() -> Element {
             Header { subtitle: "Welcome back to", title: "Bind" }
 
             // OAuth
-            Column { gap: "24px",
+            if !keyboard_open() {
+                Column { gap: "24px",
 
-                button { class: "solid", onclick: move |_| {},
-                    GoogleIcon {}
-                    "Login with Google"
-                }
-                button { class: "solid", onclick: move |_| {},
-                    AppleIcon {}
-                    "Login with Apple"
+                    button { class: "solid", onclick: move |_| {},
+                        GoogleIcon {}
+                        "Login with Google"
+                    }
+                    button { class: "solid", onclick: move |_| {},
+                        AppleIcon {}
+                        "Login with Apple"
+                    }
                 }
             }
 
@@ -77,8 +91,9 @@ pub fn Login() -> Element {
                         UserIcon {}
                     },
                     input_type: "email",
+                    value: auth_form.email_or_username(),
                     onchange: move |value| {
-                        email_or_username.set(value);
+                        auth_form.set_email_or_username(value);
                     },
                 }
                 Input {
@@ -88,8 +103,9 @@ pub fn Login() -> Element {
                         LockIcon {}
                     },
                     input_type: "password",
+                    value: auth_form.password(),
                     onchange: move |value| {
-                        password.set(value);
+                        auth_form.set_password(value);
                     },
                 }
 

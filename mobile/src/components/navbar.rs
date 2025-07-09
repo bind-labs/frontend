@@ -1,4 +1,4 @@
-use dioxus::prelude::*;
+use dioxus::{html::u::z_index, prelude::*};
 use ui::forms::button::UnstyledButton;
 
 use crate::views::Route;
@@ -51,9 +51,6 @@ pub fn Navbar(children: Element) -> Element {
     rsx! {
         nav {
             id: "navbar",
-            display: "flex",
-            border_top: "1px solid #000000",
-            padding: "16px 0px",
             {children}
         }
     }

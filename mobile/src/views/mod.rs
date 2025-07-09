@@ -18,23 +18,24 @@ use crate::{
 #[rustfmt::skip]
 pub enum Route {
     #[layout(RootLayout)]
-        // Auth
-        #[route("/auth/sign-up")]
-        SignUp {},
-        // TODO: better way to send this data to the route?
-        // https://github.com/DioxusLabs/dioxus/issues/3874
-        #[route("/auth/verify-email?:email&:username&:password")]
-        VerifyEmail {
-            email: String,
-            username: String,
-            password: String,
-        },
-        #[route("/auth/login")]
-        Login {},
-        #[route("/auth/reset-password")]
-        ResetPassword {},
-        #[route("/auth/reset-password-confirm?:email")]
-        ResetPasswordConfirm { email: String },
+        #[layout(AuthLayout)]
+            // Auth
+            #[route("/auth/sign-up")]
+            SignUp {},
+            // TODO: better way to send this data to the route?
+            // https://github.com/DioxusLabs/dioxus/issues/3874
+            #[route("/auth/verify-email?:email&:username&:password")]
+            VerifyEmail {
+                email: String,
+                username: String,
+                password: String,
+            },
+            #[route("/auth/login")]
+            Login {},
+            #[route("/auth/reset-password")]
+            ResetPassword {},
+            #[route("/auth/reset-password-confirm?:email")]
+            ResetPasswordConfirm { email: String },
 
         // Dashboard
         #[layout(DashboardLayout)]

@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
 
+use crate::views::auth::use_auth_form;
 use crate::views::Route;
 use crate::{
     hooks::use_api,
@@ -22,18 +23,19 @@ use ui::{
 #[component]
 pub fn ResetPassword() -> Element {
     let api = use_api();
-    let mut email = use_signal(String::new);
+    let mut auth_form = use_auth_form();
     let mut error = use_signal(|| None::<String>);
 
     let send_password_reset_code = use_callback(move |_| {
-        if let Err(err) = validate_email(&email()) {
+        let email = auth_form.email();
+        if let Err(err) = validate_email(&email) {
             error.set(Some(err));
-        } 
+        }
 
         spawn(async move {
-            match api.send_password_reset_code(&email()).await {
+            match api.send_password_reset_code(&email).await {
                 Ok(_) => {
-                    navigator().push(Route::ResetPasswordConfirm { email: email() });
+                    navigator().push(Route::ResetPasswordConfirm { email });
                 }
                 Err(err) => {
                     error.set(Some(err.message()));
@@ -59,7 +61,8 @@ pub fn ResetPassword() -> Element {
                     EnvelopeIcon {}
                 },
                 input_type: "email",
-                onchange: move |value| email.set(value),
+                value: auth_form.email(),
+                onchange: move |value| auth_form.set_email(value),
             }
 
             Column { gap: "8px",

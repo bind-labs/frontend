@@ -31,6 +31,14 @@ hr {
   align-self: center;
 }
 
+#navbar {
+  display: flex;
+  background-color: var(--bg);
+  border-top: 1px solid var(--text);
+  padding: 16px 0px;
+  z-index: var(--z-index-navbar);
+}
+
 /* Button */
 button {
   display: flex;
@@ -86,7 +94,7 @@ dialog#popup {
   border-top: 1px solid var(--text);
   background-color: var(--bg);
 
-  z-index: 1001;
+  z-index: var(--z-index-popup);
 }
 
 /* Top shadow */
@@ -120,5 +128,26 @@ dialog#popup.slide-out {
   right: 0;
   bottom: 0;
 
-  z-index: 1000;
+  z-index: var(--z-index-popup-backdrop);
+}
+
+/** Views **/
+
+/* Dashboard */
+#dashboard {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  height: 100vh;
+  width: 100vw;
+}
+
+#dashboard > main {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  overflow: auto;
+}
+
+#dashboard > main > *:nth-child(2) {
+  overflow: auto;
 }

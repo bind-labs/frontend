@@ -59,6 +59,7 @@ pub fn ResetPasswordConfirm(email: String) -> Element {
                     LockIcon {}
                 },
                 input_type: "password",
+                value: password(),
                 onchange: move |value| password.set(value),
             }
 
