@@ -1,51 +1,51 @@
 use dioxus::prelude::*;
+use reqwest::Url;
 use ui::layout::*;
+
+use crate::components::activity::Activity;
 
 #[derive(Props, Clone, PartialEq)]
 pub struct FeedListItemProps {
-    pub image_url: String,
     pub title: String,
     pub description: String,
-    pub feed_name: String,
-    pub created_at: String,
-    pub unread: bool,
+    pub image_url: String,
+    pub link: Url,
 }
 
 #[component]
 pub fn FeedListItem(props: FeedListItemProps) -> Element {
     let FeedListItemProps {
-        image_url,
         title,
         description,
-        feed_name,
-        created_at,
-        unread,
+        image_url,
+        link,
     } = props;
 
-    rsx! {
-        Row {
-            padding: "10px 16px",
-            border_bottom: "1px solid var(--text-secondary)",
-            gap: "12px",
-            cross_align: "center",
+    let link_pretty = format!(
+        "{} > {}",
+        link.host_str().unwrap_or_default().replace("www.", ""),
+        link.path_segments()
+            .map(|segments| segments.collect::<Vec<&str>>().join(" > "))
+            .unwrap_or_default()
+    );
 
-            img { src: image_url, width: "80px", height: "80px" }
-            Column { gap: "2px",
-                span {
-                    font_size: "16px",
-                    color: if unread { "var(--text)" } else { "var(--text-tertiary)" },
+    rsx! {
+        div { display: "grid", grid_template_rows: "auto auto", row_gap: "8px", grid_template_columns: "auto auto", column_gap: "8px",
+            padding: "8px 16px",
+            border_bottom: "1px solid var(--text-secondary)",
+
+            img { src: image_url, max_width: "48px", max_height: "48px", width: "100%", align_self: "center" }
+            Column {
+                span { font_size: "18px",
                     "{title}"
                 }
-                span {
-                    font_size: "12px",
-                    color: if unread { "var(--text-secondary)" } else { "var(--text-tertiary)" },
-                    "({feed_name}) {created_at}"
+                span { font_size: "14px", color: "var(--text-secondary)",
+                    "{link_pretty}"
                 }
-                span {
-                    font_size: "12px",
-                    color: if unread { "var(--text-secondary)" } else { "var(--text-tertiary)" },
-                    "{description}"
-                }
+            }
+            Activity { points: vec![0.5, 0.8, 0., 0.5, 0.4, 1., 0.1], per_month: 24 }
+            span { font_size: "14px", text_overflow: "ellipsis", overflow: "hidden", style: "display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;",
+                "{description}"
             }
         }
     }
@@ -58,12 +58,10 @@ pub fn FeedList(num: usize) -> Element {
             for i in 0..num {
                 FeedListItem {
                     key: "{i}",
-                    image_url: "https://upload.wikimedia.org/wikipedia/en/d/d1/Plasticbeach452.jpg",
-                    title: "On Melancholy Hill",
-                    description: "On Melancholy Hill is the third single from British virtual band Gorillaz's third studio album, Plastic Beach.",
-                    feed_name: "Genius",
-                    created_at: "28 minutes ago",
-                    unread: i % 2 == 0,
+                    image_url: "https://www.nasa.gov/wp-content/themes/nasa/assets/images/nasa-logo@2x.png",
+                    title: "NASA",
+                    link: Url::parse("https://www.nasa.gov/rss/dyn/breaking_news.rss").unwrap(),
+                    description: "Official National Aeronautics and Space Administration Website",
                 }
             }
         }

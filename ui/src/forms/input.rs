@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use dioxus::prelude::*;
+use dioxus::{logger::tracing, prelude::*};
 
 #[derive(Clone, Debug, Copy, PartialEq)]
 pub enum IconPosition {
@@ -16,11 +16,13 @@ pub struct Props {
     input_type: Option<String>,
     icon: Option<Element>,
     icon_position: Option<IconPosition>,
+    value: String,
     onchange: Callback<String>,
 }
 
 #[allow(non_snake_case)]
 pub fn Input(props: Props) -> Element {
+    tracing::info!("value: {:?}", props.value);
     let mut element_ref = use_signal(|| None::<Rc<MountedData>>);
 
     let title = props.title.map(|title| -> Element {
@@ -91,6 +93,7 @@ pub fn Input(props: Props) -> Element {
                 outline: "none",
 
                 type: props.input_type,
+                value: props.value,
                 onchange: move |ev| props.onchange.call(ev.value().clone()),
 
                 ..props.attributes,
